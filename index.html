@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="靈光">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<title>靈光</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0a; --surface: #141414; --surface2: #1e1e1e;
+    --border: #2a2a2a; --accent: #e8e0d0; --accent-dim: #6b6560;
+    --red: #c0392b; --green: #2e9e5b; --blue: #3a7bd5; --amber: #d4a03a;
+    --gemini: #6c8cd5;
+    --text: #d4cec7; --text-dim: #6b6560;
+    --mono: 'Courier New', monospace;
+  }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: -apple-system, 'Helvetica Neue', sans-serif;
+    min-height: 100vh; display: flex; flex-direction: column;
+    max-width: 480px; margin: 0 auto; overflow-x: hidden;
+    padding-bottom: 80px;
+  }
+
+  /* ── Header ── */
+  .header {
+    padding: 18px 20px 12px; display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: var(--bg); z-index: 20;
+  }
+  .logo { font-size: 21px; font-weight: 700; color: var(--accent); }
+  .logo span { color: var(--accent-dim); font-weight: 300; font-size: 13px; }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .save-status { font-size: 10px; color: var(--text-dim); font-family: var(--mono); }
+  .settings-btn {
+    width: 30px; height: 30px; border-radius: 8px; background: var(--surface);
+    border: 1px solid var(--border); cursor: pointer; display: flex;
+    align-items: center; justify-content: center; font-size: 15px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ── API Key Banner ── */
+  .api-banner {
+    margin: 12px 20px 0; padding: 11px 14px; border-radius: 10px;
+    background: rgba(192,57,43,0.1); border: 1px solid rgba(192,57,43,0.3);
+    font-size: 12.5px; color: #e07b6e; display: flex; align-items: center; gap: 8px;
+    cursor: pointer;
+  }
+  .api-banner.hidden { display: none; }
+
+  /* ── Capture ── */
+  .capture-zone { padding: 14px 20px 10px; display: flex; flex-direction: column; gap: 10px; }
+  .text-area-wrap { position: relative; }
+  textarea {
+    width: 100%; min-height: 88px; max-height: 220px;
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 12px; color: var(--text); font-size: 16px;
+    line-height: 1.5; padding: 14px 56px 14px 16px; resize: none;
+    outline: none; font-family: inherit; transition: border-color 0.15s;
+  }
+  textarea::placeholder { color: var(--text-dim); }
+  textarea:focus { border-color: var(--accent-dim); }
+  .send-btn {
+    position: absolute; right: 10px; bottom: 12px;
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--accent); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent; transition: opacity 0.15s;
+  }
+  .send-btn:disabled { opacity: 0.25; }
+  .mic-btn {
+    position: absolute; right: 10px; top: 10px;
+    width: 38px; height: 38px; border-radius: 10px;
+    background: var(--surface2); border: 1px solid var(--border);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 17px; -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s;
+  }
+  .mic-btn.rec {
+    background: var(--red); border-color: var(--red);
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(192,57,43,0.5); }
+    50% { box-shadow: 0 0 0 8px rgba(192,57,43,0); }
+  }
+  .rec-pill {
+    padding: 7px 16px; border-radius: 9px; font-size: 13px; font-weight: 500;
+    background: var(--surface); border: 1px solid var(--border); color: var(--text);
+    cursor: pointer; -webkit-tap-highlight-color: transparent;
+    display: inline-flex; align-items: center; gap: 6px; margin-left: auto;
+  }
+  .rec-pill.rec {
+    background: var(--red); border-color: var(--red); color: #fff;
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+  .rec-hint {
+    font-size: 11px; color: var(--red); font-family: var(--mono);
+    display: none; align-items: center; gap: 6px; padding: 0 2px;
+  }
+  .rec-hint.show { display: flex; }
+  .rec-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); animation: blink 1s infinite; }
+  @keyframes blink { 50% { opacity: 0.2; } }
+
+  .hint { font-size: 11.5px; color: var(--text-dim); line-height: 1.5; padding: 0 2px; }
+  .hint b { color: var(--accent-dim); }
+
+  /* ── Provider segmented control ── */
+  .provider-row { display: flex; align-items: center; gap: 8px; }
+  .provider-label { font-size: 11px; color: var(--text-dim); font-family: var(--mono); letter-spacing: 0.5px; }
+  .provider-seg {
+    display: flex; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 9px; padding: 3px; gap: 3px;
+  }
+  .provider-opt {
+    padding: 6px 16px; font-size: 12.5px; border-radius: 7px;
+    color: var(--text-dim); cursor: pointer; user-select: none;
+    -webkit-tap-highlight-color: transparent; transition: all 0.15s;
+    display: flex; align-items: center; gap: 5px; font-weight: 500;
+  }
+  .provider-opt.active[data-p="claude"] { background: var(--accent); color: #0a0a0a; }
+  .provider-opt.active[data-p="gemini"] { background: var(--gemini); color: #fff; }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex; border-bottom: 1px solid var(--border); padding: 0 20px; gap: 4px;
+    position: sticky; top: 57px; background: var(--bg); z-index: 19;
+  }
+  .tab {
+    padding: 10px 14px; font-size: 13.5px; color: var(--text-dim);
+    cursor: pointer; border-bottom: 2px solid transparent;
+    -webkit-tap-highlight-color: transparent; user-select: none;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab .count {
+    font-size: 10px; font-family: var(--mono); background: var(--surface2);
+    border-radius: 8px; padding: 1px 6px; color: var(--accent-dim);
+  }
+
+  /* ── Inbox zone (processing / errors — independent of panels so re-renders can't wipe it) ── */
+  .inbox-zone { display: flex; flex-direction: column; gap: 8px; padding: 0 20px; }
+  .inbox-zone:not(:empty) { padding-bottom: 10px; }
+
+  .panel { display: none; flex-direction: column; gap: 10px; padding: 14px 20px 24px; }
+  .panel.active { display: flex; }
+
+  /* ── Todo ── */
+  .todo-item {
+    display: flex; align-items: flex-start; gap: 11px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 14px;
+  }
+  .todo-check {
+    width: 21px; height: 21px; border-radius: 6px;
+    border: 1.5px solid var(--accent-dim); flex-shrink: 0;
+    cursor: pointer; margin-top: 1px; display: flex;
+    align-items: center; justify-content: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .todo-item.done .todo-check { background: var(--green); border-color: var(--green); }
+  .todo-item.done .todo-text { text-decoration: line-through; color: var(--text-dim); }
+  .todo-text { font-size: 14.5px; line-height: 1.5; flex: 1; }
+  .todo-meta { font-size: 10px; color: var(--text-dim); font-family: var(--mono); margin-top: 3px; }
+  .todo-del { color: var(--text-dim); font-size: 18px; cursor: pointer; padding: 0 2px; -webkit-tap-highlight-color: transparent; }
+  .clear-done {
+    align-self: flex-end; font-size: 11.5px; color: var(--text-dim);
+    cursor: pointer; padding: 4px 8px; text-decoration: underline;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ── Event ── */
+  .event-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--blue); border-radius: 10px; padding: 13px 14px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .event-title { font-size: 15px; font-weight: 600; color: var(--accent); }
+  .event-detail { font-size: 12px; color: var(--text-dim); line-height: 1.6; font-family: var(--mono); }
+  .event-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .action-btn {
+    font-size: 12px; padding: 7px 13px; border-radius: 7px;
+    border: 1px solid var(--border); background: var(--surface2);
+    color: var(--accent); cursor: pointer; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 5px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .action-btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .action-btn.muted { color: var(--text-dim); }
+
+  /* ── Note ── */
+  .note-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 3px solid var(--amber); border-radius: 10px; padding: 13px 14px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .note-raw { font-size: 12px; color: var(--text-dim); border-left: 2px solid var(--border); padding-left: 9px; line-height: 1.5; }
+  .note-expanded {
+    background: rgba(46,158,91,0.07); border-left: 2px solid var(--green);
+    border-radius: 6px; padding: 10px 12px; font-size: 13px;
+    line-height: 1.65; white-space: pre-wrap;
+  }
+  .note-expanded-label { font-size: 10px; color: var(--green); font-family: var(--mono); margin-bottom: 5px; }
+  .note-body { font-size: 13.5px; line-height: 1.65; white-space: pre-wrap; }
+  .note-time { font-size: 10px; font-family: var(--mono); color: var(--text-dim); }
+  .note-actions { display: flex; gap: 8px; }
+
+  /* ── Processing ── */
+  .inbox-item {
+    background: var(--surface); border: 1px dashed var(--border);
+    border-radius: 10px; padding: 12px 14px;
+    font-size: 13px; color: var(--text-dim);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .spinner {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid var(--border); border-top-color: var(--accent);
+    animation: spin 0.8s linear infinite; flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty { text-align: center; padding: 36px 20px; color: var(--text-dim); font-size: 13.5px; line-height: 1.7; }
+  .error-card {
+    background: rgba(192,57,43,0.08); border: 1px solid rgba(192,57,43,0.25);
+    border-radius: 10px; padding: 12px 14px; font-size: 12.5px; color: #e07b6e; line-height: 1.5;
+  }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px; width: 88%; max-width: 380px;
+    display: flex; flex-direction: column; gap: 14px;
+    max-height: 85vh; overflow-y: auto;
+  }
+  .modal-title { font-size: 17px; font-weight: 600; color: var(--accent); }
+  .modal-desc { font-size: 12.5px; color: var(--text-dim); line-height: 1.55; }
+  .modal-desc a { color: var(--blue); }
+  .modal input[type="password"], .modal input[type="text"] {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 9px; color: var(--text); font-size: 14px;
+    padding: 11px 14px; outline: none; font-family: var(--mono);
+  }
+  .modal input:focus { border-color: var(--accent-dim); }
+  .modal-row { display: flex; gap: 10px; }
+  .modal-btn {
+    flex: 1; padding: 11px; border-radius: 9px; font-size: 14px; font-weight: 500;
+    cursor: pointer; border: none; -webkit-tap-highlight-color: transparent;
+  }
+  .modal-btn.cancel { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); }
+  .modal-btn.confirm { background: var(--accent); color: #0a0a0a; }
+  .modal-label { font-size: 11px; color: var(--text-dim); letter-spacing: 0.8px; text-transform: uppercase; font-family: var(--mono); margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo">靈光 <span>v4</span></div>
+  <div class="header-right">
+    <div class="save-status" id="saveStatus"></div>
+    <div class="settings-btn" onclick="openModal()" title="設定 API Key">⚙️</div>
+  </div>
+</div>
+
+<!-- API Key missing banner -->
+<div class="api-banner" id="apiBanner" onclick="openModal()">
+  ⚠️ 尚未設定 API Key，點此設定後即可使用
+</div>
+
+<!-- Capture -->
+<div class="capture-zone">
+  <div class="text-area-wrap">
+    <textarea id="textInput" placeholder="記下任何想法…&#10;AI 會自動分類成待辦、行程或筆記" rows="3"></textarea>
+    <button class="mic-btn" id="micBtn" onclick="toggleDictate()" title="語音輸入（即時聽寫進輸入框）">🎙</button>
+    <button class="send-btn" id="sendBtn" disabled onclick="submitText()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0a0a0a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    </button>
+  </div>
+  <div class="rec-hint" id="recHint"><div class="rec-dot"></div>錄音中 <span id="recTime">0:00</span>　按「◼ 停止」結束並送出</div>
+  <div class="provider-row">
+    <span class="provider-label">模型</span>
+    <div class="provider-seg" id="providerSeg">
+      <div class="provider-opt" data-p="claude" onclick="setProvider('claude')">Claude</div>
+      <div class="provider-opt" data-p="gemini" onclick="setProvider('gemini')">Gemini</div>
+    </div>
+    <button class="rec-pill" id="recBtn" onclick="toggleRec()">⏺ 錄音</button>
+  </div>
+  <div class="hint">
+    🎙 <b>聽寫：</b>即時轉文字進輸入框，可編輯後送出　⏺ <b>錄音：</b>存音檔＋Gemini 轉文字自動分類<br>
+    💡 <b>範例：</b>「下週三下午兩點跟POC開會」→ 自動進行程；「要記得回山田的信」→ 自動進待辦
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab active" data-tab="todos" onclick="switchTab(this)">✅ 待辦 <span class="count" id="countTodos">0</span></div>
+  <div class="tab" data-tab="events" onclick="switchTab(this)">📅 行程 <span class="count" id="countEvents">0</span></div>
+  <div class="tab" data-tab="notes" onclick="switchTab(this)">💡 想法 <span class="count" id="countNotes">0</span></div>
+</div>
+
+<!-- Processing / error zone (won't be wiped by list re-renders) -->
+<div class="inbox-zone" id="inboxZone"></div>
+
+<!-- Panels -->
+<div class="panel active" id="panel-todos"></div>
+<div class="panel" id="panel-events"></div>
+<div class="panel" id="panel-notes"></div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-title">⚙️ API 設定</div>
+    <div class="modal-desc">
+      金鑰僅存於本機 localStorage，不會傳送到任何第三方。<br>
+      Claude 金鑰：<a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a><br>
+      Gemini 金鑰：<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com</a>
+    </div>
+    <div>
+      <div class="modal-label">Claude API Key</div>
+      <input type="password" id="claudeKeyInput" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false">
+    </div>
+    <div>
+      <div class="modal-label">Gemini API Key</div>
+      <input type="password" id="geminiKeyInput" placeholder="AIza..." autocomplete="off" spellcheck="false">
+    </div>
+    <div class="modal-row">
+      <button class="modal-btn cancel" onclick="closeModal()">取消</button>
+      <button class="modal-btn confirm" onclick="saveApiKeys()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ════════ Config ════════
+const MODELS = {
+  claude: { label: 'Claude', model: 'claude-sonnet-4-6' },
+  gemini: { label: 'Gemini', model: 'gemini-2.5-flash' }
+};
+
+// ════════ Provider / API Key 管理 ════════
+function lsGet(k) { try { return localStorage.getItem(k) || ''; } catch(e) { return ''; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch(e) {} }
+
+function getProvider() {
+  const p = lsGet('lingguang_provider');
+  return MODELS[p] ? p : 'claude';
+}
+function setProvider(p) {
+  lsSet('lingguang_provider', p);
+  document.querySelectorAll('.provider-opt').forEach(el =>
+    el.classList.toggle('active', el.dataset.p === p));
+  updateBanner();
+}
+function getApiKey(p) { return lsGet('lingguang_apikey_' + (p || getProvider())); }
+
+function openModal() {
+  document.getElementById('claudeKeyInput').value = getApiKey('claude') || lsGet('lingguang_apikey'); // 兼容 v3 舊金鑰
+  document.getElementById('geminiKeyInput').value = getApiKey('gemini');
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+function closeModalOutside(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+function saveApiKeys() {
+  lsSet('lingguang_apikey_claude', document.getElementById('claudeKeyInput').value.trim());
+  lsSet('lingguang_apikey_gemini', document.getElementById('geminiKeyInput').value.trim());
+  closeModal();
+  updateBanner();
+  showSaveStatus('✓ 已儲存');
+}
+function updateBanner() {
+  const has = !!getApiKey();
+  const banner = document.getElementById('apiBanner');
+  banner.classList.toggle('hidden', has);
+  if (!has) banner.textContent = `⚠️ 尚未設定 ${MODELS[getProvider()].label} API Key，點此設定`;
+}
+
+// ════════ Storage layer ════════
+const memStore = {};
+const store = {
+  async get(key) {
+    try { if (window.storage) { const r = await window.storage.get(key); return r ? r.value : null; } } catch(e) {}
+    const v = lsGet(key);
+    if (v) return v;
+    return memStore[key] || null;
+  },
+  async set(key, value) {
+    try { if (window.storage) { await window.storage.set(key, value); showSaveStatus('✓ 已保存'); return; } } catch(e) {}
+    try { localStorage.setItem(key, value); showSaveStatus('✓ 已保存'); return; } catch(e) {}
+    memStore[key] = value;
+    showSaveStatus('⚠ 僅暫存');
+  }
+};
+let saveStatusTimer = null;
+function showSaveStatus(msg) {
+  const el = document.getElementById('saveStatus');
+  el.textContent = msg;
+  clearTimeout(saveStatusTimer);
+  saveStatusTimer = setTimeout(() => el.textContent = '', 2500);
+}
+
+// ════════ State ════════
+let state = { todos: [], events: [], notes: [] };
+
+async function loadState() {
+  const raw = await store.get('lingguang-v3-state'); // 沿用 v3 key，保留舊資料
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      state = {
+        todos: Array.isArray(parsed.todos) ? parsed.todos : [],
+        events: Array.isArray(parsed.events) ? parsed.events : [],
+        notes: Array.isArray(parsed.notes) ? parsed.notes : []
+      };
+    } catch(e) {}
+  }
+  renderAll();
+}
+async function saveState() { await store.set('lingguang-v3-state', JSON.stringify(state)); }
+
+// ════════ UI helpers ════════
+function switchTab(el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-' + el.dataset.tab).classList.add('active');
+}
+function switchTabByName(name) {
+  const el = document.querySelector(`.tab[data-tab="${name}"]`);
+  if (el) switchTab(el);
+}
+
+const textInput = document.getElementById('textInput');
+function updateSendBtn() {
+  document.getElementById('sendBtn').disabled = !textInput.value.trim();
+}
+function autoGrow() {
+  textInput.style.height = 'auto';
+  textInput.style.height = Math.min(textInput.scrollHeight, 220) + 'px';
+}
+textInput.addEventListener('input', () => { updateSendBtn(); autoGrow(); });
+textInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); submitText(); }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function submitText() {
+  const val = textInput.value.trim();
+  if (!val) return;
+  if (!getApiKey()) { openModal(); return; }
+  if (dictating) stopDictate();
+  textInput.value = '';
+  updateSendBtn(); autoGrow();
+  processIdea(val);
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/\n/g,'<br>');
+}
+function fmtTime(ts) {
+  const d = new Date(ts);
+  if (isNaN(d)) return '';
+  return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+function showError(msg) {
+  const errEl = document.createElement('div');
+  errEl.className = 'error-card';
+  errEl.innerHTML = msg;
+  document.getElementById('inboxZone').appendChild(errEl);
+  setTimeout(() => errEl.remove(), 8000);
+}
+
+// ════════ 音檔儲存（IndexedDB，localStorage 放不下音訊）════════
+function idbOpen() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open('lingguang-audio', 1);
+    req.onupgradeneeded = () => req.result.createObjectStore('audio');
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => rej(req.error);
+  });
+}
+async function audioSave(id, blob) {
+  const db = await idbOpen();
+  return new Promise((res, rej) => {
+    const tx = db.transaction('audio', 'readwrite');
+    tx.objectStore('audio').put(blob, id);
+    tx.oncomplete = res; tx.onerror = () => rej(tx.error);
+  });
+}
+async function audioGet(id) {
+  const db = await idbOpen();
+  return new Promise((res, rej) => {
+    const r = db.transaction('audio').objectStore('audio').get(id);
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+async function audioDel(id) {
+  if (!id) return;
+  try {
+    const db = await idbOpen();
+    db.transaction('audio', 'readwrite').objectStore('audio').delete(id);
+  } catch(e) {}
+}
+
+// ════════ 播放 ════════
+let curAudio = null, curPlayingId = null;
+async function playAudio(id) {
+  if (curPlayingId === id && curAudio) {
+    curAudio.pause(); curAudio = null; curPlayingId = null; renderAll(); return;
+  }
+  let blob;
+  try { blob = await audioGet(id); } catch(e) {}
+  if (!blob) { showError('⚠ 找不到音檔'); return; }
+  if (curAudio) curAudio.pause();
+  const url = URL.createObjectURL(blob);
+  curAudio = new Audio(url);
+  curPlayingId = id;
+  curAudio.onended = () => { curPlayingId = null; URL.revokeObjectURL(url); renderAll(); };
+  curAudio.onerror = () => { curPlayingId = null; URL.revokeObjectURL(url); showError('⚠ 無法播放音檔'); renderAll(); };
+  try { await curAudio.play(); } catch(e) { curPlayingId = null; }
+  renderAll();
+}
+function playBtnHtml(audioId, cls) {
+  if (!audioId) return '';
+  return `<span class="${cls}" onclick="playAudio('${audioId}')">${curPlayingId === audioId ? '⏸ 停止' : '▶ 播放錄音'}</span>`;
+}
+
+// ════════ 語音輸入（即時聽寫 → 文字進輸入框）════════
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let dictation = null, dictating = false, dictBase = '';
+
+function toggleDictate() {
+  if (!SR) {
+    alert('此瀏覽器不支援即時聽寫。\n請改用 iOS 鍵盤的麥克風聽寫（點輸入框後按鍵盤上的 🎙），或用 ⏺ 錄音鍵。');
+    return;
+  }
+  if (dictating) { stopDictate(); return; }
+  if (recording) stopRec(); // 不與錄音同時進行
+  dictation = new SR();
+  dictation.lang = 'zh-TW';
+  dictation.interimResults = true;
+  dictation.continuous = true;
+  dictBase = textInput.value.trim();
+  dictation.onresult = e => {
+    let txt = '';
+    for (const r of e.results) txt += r[0].transcript;
+    textInput.value = dictBase ? dictBase + ' ' + txt : txt;
+    updateSendBtn(); autoGrow();
+  };
+  dictation.onerror = e => {
+    setDictUI(false);
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed')
+      alert('無法使用麥克風，請到瀏覽器設定允許麥克風權限。');
+    else if (e.error !== 'aborted' && e.error !== 'no-speech')
+      showError('⚠ 聽寫錯誤：' + esc(e.error));
+  };
+  dictation.onend = () => setDictUI(false);
+  try { dictation.start(); setDictUI(true); }
+  catch(e) { setDictUI(false); }
+}
+function stopDictate() { try { dictation && dictation.stop(); } catch(e) {} setDictUI(false); }
+function setDictUI(on) {
+  dictating = on;
+  document.getElementById('micBtn').classList.toggle('rec', on);
+}
+
+// ════════ 錄音（MediaRecorder）════════
+let mediaRec = null, recChunks = [], recording = false, recTimer = null, recStartTs = 0, recStream = null;
+const canRecord = !!(navigator.mediaDevices?.getUserMedia && window.MediaRecorder);
+
+async function toggleRec() {
+  if (recording) { stopRec(); return; }
+  if (!canRecord) { alert('此瀏覽器不支援錄音，請改用 🎙 聽寫或 iOS 鍵盤的麥克風聽寫。'); return; }
+  if (dictating) stopDictate(); // 不與聽寫同時進行
+  try { recStream = await navigator.mediaDevices.getUserMedia({ audio: true }); }
+  catch(e) { alert('無法使用麥克風，請到設定允許麥克風權限。'); return; }
+  const mime = ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm']
+    .find(t => MediaRecorder.isTypeSupported(t)) || '';
+  mediaRec = new MediaRecorder(recStream, mime ? { mimeType: mime } : undefined);
+  recChunks = [];
+  mediaRec.ondataavailable = e => { if (e.data.size) recChunks.push(e.data); };
+  mediaRec.onstop = onRecStop;
+  mediaRec.start();
+  recStartTs = Date.now();
+  setRecUI(true);
+  recTimer = setInterval(() => {
+    const s = Math.floor((Date.now() - recStartTs) / 1000);
+    document.getElementById('recTime').textContent = `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+  }, 500);
+}
+function stopRec() {
+  try { if (mediaRec && mediaRec.state !== 'inactive') mediaRec.stop(); } catch(e) { setRecUI(false); }
+}
+function setRecUI(on) {
+  recording = on;
+  const b = document.getElementById('recBtn');
+  b.classList.toggle('rec', on);
+  b.textContent = on ? '◼ 停止' : '⏺ 錄音';
+  document.getElementById('recHint').classList.toggle('show', on);
+  if (on) document.getElementById('recTime').textContent = '0:00';
+}
+async function onRecStop() {
+  clearInterval(recTimer);
+  setRecUI(false);
+  try { recStream?.getTracks().forEach(t => t.stop()); } catch(e) {}
+  const blob = new Blob(recChunks, { type: mediaRec.mimeType || 'audio/webm' });
+  recChunks = [];
+  if (blob.size < 800) { showError('⚠ 錄音太短，已捨棄'); return; }
+  const audioId = 'a' + Date.now();
+  try { await audioSave(audioId, blob); }
+  catch(e) { showError('⚠ 音檔儲存失敗：' + esc(e.message)); }
+  transcribeAndClassify(blob, audioId);
+}
+
+function blobToB64(blob) {
+  return new Promise((res, rej) => {
+    const fr = new FileReader();
+    fr.onload = () => res(String(fr.result).split(',')[1]);
+    fr.onerror = () => rej(fr.error);
+    fr.readAsDataURL(blob);
+  });
+}
+
+// 轉文字固定用 Gemini（Claude API 不支援音訊輸入）；後續分類仍用所選模型
+async function transcribeAndClassify(blob, audioId) {
+  const gKey = getApiKey('gemini');
+  if (!gKey) {
+    await saveVoiceNote(audioId, '🎙 語音備忘錄（未轉文字：需設定 Gemini API Key）');
+    showError('⚠ 轉文字需要 Gemini API Key（設定 ⚙️），錄音已先存成語音備忘錄');
+    return;
+  }
+  const inbox = document.createElement('div');
+  inbox.className = 'inbox-item';
+  inbox.innerHTML = `<div class="spinner"></div><div style="flex:1">Gemini 轉文字中…</div>`;
+  document.getElementById('inboxZone').appendChild(inbox);
+  try {
+    const b64 = await blobToB64(blob);
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODELS.gemini.model}:generateContent`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': gKey },
+      body: JSON.stringify({
+        contents: [{ role: 'user', parts: [
+          { text: '請將這段語音逐字轉錄為繁體中文文字。只輸出轉錄結果，不要任何說明或標點以外的文字。' },
+          { inline_data: { mime_type: blob.type.split(';')[0] || 'audio/webm', data: b64 } }
+        ]}],
+        generationConfig: { maxOutputTokens: 2048 }
+      })
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error?.message || `Gemini HTTP ${res.status}`);
+    const transcript = (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('').trim();
+    inbox.remove();
+    if (!transcript) throw new Error('轉錄結果為空');
+    processIdea(transcript, audioId);
+  } catch(err) {
+    inbox.remove();
+    await saveVoiceNote(audioId, '🎙 語音備忘錄（轉文字失敗，可播放原音）');
+    showError('⚠ 轉文字失敗：' + esc(err.message) + '<br><span style="font-size:11px;opacity:0.7">錄音已存成語音備忘錄</span>');
+  }
+}
+async function saveVoiceNote(audioId, summary) {
+  state.notes.unshift({ id: Date.now(), summary, raw: '', time: Date.now(), audioId });
+  await saveState(); renderAll(); switchTabByName('notes');
+}
+
+// ════════ LLM 呼叫（Claude / Gemini）════════
+async function callLLM(systemPrompt, userText) {
+  const provider = getProvider();
+  const key = getApiKey(provider);
+
+  if (provider === 'gemini') {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODELS.gemini.model}:generateContent`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: systemPrompt }] },
+        contents: [{ role: 'user', parts: [{ text: userText }] }],
+        generationConfig: { maxOutputTokens: 1024, responseMimeType: 'application/json' }
+      })
+    });
+    const data = await res.json();
+    if (!res.ok || data.error) throw new Error(data.error?.message || `Gemini HTTP ${res.status}`);
+    const parts = data.candidates?.[0]?.content?.parts;
+    if (!parts) throw new Error('Gemini 回應為空' + (data.candidates?.[0]?.finishReason ? `（${data.candidates[0].finishReason}）` : ''));
+    return parts.map(p => p.text || '').join('');
+  }
+
+  // Claude
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: MODELS.claude.model,
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userText }]
+    })
+  });
+  const data = await res.json();
+  if (!res.ok || data.error) throw new Error(data.error?.message || `Claude HTTP ${res.status}`);
+  return (data.content || []).map(b => b.text || '').join('');
+}
+
+function extractJSON(text) {
+  const cleaned = text.replace(/```json|```/g, '').trim();
+  try { return JSON.parse(cleaned); } catch(e) {}
+  const m = cleaned.match(/\{[\s\S]*\}/); // 容錯：抓最外層 {}
+  if (m) return JSON.parse(m[0]);
+  throw new Error('無法解析 AI 回應');
+}
+
+// ════════ Process ════════
+async function processIdea(rawText, audioId) {
+  const inbox = document.createElement('div');
+  inbox.className = 'inbox-item';
+  inbox.innerHTML = `<div class="spinner"></div><div style="flex:1">${esc(MODELS[getProvider()].label)} 分類中：${esc(rawText.slice(0,28))}${rawText.length>28?'…':''}</div>`;
+  document.getElementById('inboxZone').appendChild(inbox);
+
+  const now = new Date();
+  const weekday = ['日','一','二','三','四','五','六'][now.getDay()];
+  const nowStr = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} 週${weekday} ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')} (Asia/Taipei, UTC+8)`;
+
+  const systemPrompt = `你是想法分類引擎。使用者是 Stanley，匠滑雪 TKR 創辦人，繁體中文使用者。
+現在時間：${nowStr}
+
+只回傳純 JSON，絕對不能有 markdown、代碼框或任何其他文字。格式：
+{
+  "type": "todo" | "event" | "note",
+  "todos": [{"text": "可執行的待辦，動詞開頭", "due": "若原文含期限或時間，填 ISO 8601 含時區（如 2026-06-15T12:00:00+08:00），否則省略此欄位"}],
+  "event": {
+    "title": "事件標題",
+    "start": "ISO 8601，含時區，如 2026-06-19T14:00:00+08:00",
+    "end": "ISO 8601，預設開始後1小時",
+    "location": "地點，無則空字串",
+    "description": "補充說明，無則空字串"
+  },
+  "note": {
+    "summary": "整理後的想法，結構清晰，可日後直接行動"
+  }
+}
+
+分類規則：
+- 含具體日期/時間的行程安排 → event（相對時間如「下週三」根據現在時間換算為具體日期）
+- 含行動意圖但無具體時間 → todo（一句含多個行動就拆成多個 todos）
+- 純點子、觀察、靈感 → note（幫他整理成結構化可行動的形式）
+- type 為何者，對應欄位就必須存在`;
+
+  try {
+    const text = await callLLM(systemPrompt, rawText);
+    const parsed = extractJSON(text);
+    inbox.remove();
+    const ts = Date.now();
+
+    if (parsed.type === 'todo' && parsed.todos?.length) {
+      parsed.todos.forEach((t, i) => {
+        if (t?.text) state.todos.unshift({ id: ts + i, text: t.text, done: false, raw: rawText, time: ts,
+          due: (t.due && !isNaN(new Date(t.due))) ? t.due : undefined,
+          audioId: i === 0 ? audioId : undefined }); // 音檔掛在第一個待辦
+      });
+      switchTabByName('todos');
+    } else if (parsed.type === 'event' && parsed.event?.start && !isNaN(new Date(parsed.event.start))) {
+      state.events.unshift({ id: ts, ...parsed.event, raw: rawText, time: ts, audioId });
+      switchTabByName('events');
+    } else {
+      const summary = parsed.note?.summary || rawText;
+      state.notes.unshift({ id: ts, summary, raw: rawText, time: ts, audioId });
+      switchTabByName('notes');
+    }
+
+    await saveState();
+    renderAll();
+  } catch(err) {
+    inbox.remove();
+    // Fallback: 原文存為 note，不遺失
+    state.notes.unshift({ id: Date.now(), summary: rawText, raw: rawText, time: Date.now(), error: true, audioId });
+    await saveState();
+    renderAll();
+    showError(`⚠ 處理失敗：${esc(err.message)}<br><span style="font-size:11px;opacity:0.7">原文已存入「想法」分頁</span>`);
+  }
+}
+
+// ════════ Render ════════
+function renderAll() { renderTodos(); renderEvents(); renderNotes(); }
+
+function renderTodos() {
+  const panel = document.getElementById('panel-todos');
+  document.getElementById('countTodos').textContent = state.todos.filter(t => !t.done).length;
+  if (!state.todos.length) {
+    panel.innerHTML = `<div class="empty">尚無待辦<br><span style="font-size:12px">「要記得…」「明天要做…」會自動分類進來</span></div>`;
+    return;
+  }
+  let html = '';
+  if (state.todos.some(t => t.done)) {
+    html += `<div class="clear-done" onclick="clearDone()">清除已完成</div>`;
+  }
+  state.todos.forEach(t => {
+    html += `<div class="todo-item${t.done?' done':''}">
+      <div class="todo-check" onclick="toggleTodo(${t.id})">
+        ${t.done?`<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`:''}
+      </div>
+      <div style="flex:1">
+        <div class="todo-text">${esc(t.text)}</div>
+        <div class="todo-meta">${fmtTime(t.time)}${t.due?` · ⏰ 期限 ${fmtTime(new Date(t.due).getTime())} <span style="cursor:pointer;color:var(--blue)" onclick="dlTodoICS(${t.id})">設提醒</span>`:''}${t.audioId?` · <span style="cursor:pointer;color:var(--blue)" onclick="playAudio('${t.audioId}')">${curPlayingId===t.audioId?'⏸ 停止':'▶ 錄音'}</span>`:''}</div>
+      </div>
+      <div class="todo-del" onclick="delTodo(${t.id})">×</div>
+    </div>`;
+  });
+  panel.innerHTML = html;
+}
+
+async function toggleTodo(id) {
+  const t = state.todos.find(x => x.id === id);
+  if (t) { t.done = !t.done; await saveState(); renderAll(); }
+}
+async function delTodo(id) {
+  audioDel(state.todos.find(x => x.id === id)?.audioId);
+  state.todos = state.todos.filter(x => x.id !== id);
+  await saveState(); renderAll();
+}
+async function clearDone() {
+  state.todos.filter(t => t.done).forEach(t => audioDel(t.audioId));
+  state.todos = state.todos.filter(t => !t.done);
+  await saveState(); renderAll();
+}
+
+// ════════ Calendar export ════════
+function icsDate(iso) {
+  const d = new Date(iso);
+  if (isNaN(d)) return null;
+  return d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
+}
+function icsEsc(s) {
+  return String(s||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');
+}
+function gcalUrl(ev) {
+  const s = icsDate(ev.start), e = icsDate(ev.end || ev.start);
+  if (!s) return '#';
+  const p = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: ev.title || '',
+    dates: `${s}/${e || s}`,
+    details: ev.description || '',
+    location: ev.location || ''
+  });
+  return 'https://calendar.google.com/calendar/render?' + p.toString();
+}
+function dlICS(id) {
+  const ev = state.events.find(x => x.id === id);
+  if (!ev) return;
+  const s = icsDate(ev.start), e = icsDate(ev.end || ev.start);
+  if (!s) { showError('⚠ 此行程日期無效，無法匯出'); return; }
+  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//lingguang//v4//ZH','BEGIN:VEVENT',
+    `UID:lingguang-${ev.id}@local`,
+    `DTSTAMP:${icsDate(Date.now())}`,
+    `DTSTART:${s}`,
+    `DTEND:${e || s}`,
+    `SUMMARY:${icsEsc(ev.title)}`,
+    `LOCATION:${icsEsc(ev.location)}`,
+    `DESCRIPTION:${icsEsc(ev.description)}`,
+    'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const a = document.createElement('a');
+  const url = URL.createObjectURL(new Blob([ics], {type:'text/calendar'}));
+  a.href = url;
+  a.download = `${String(ev.title||'event').replace(/[\\/:*?"<>|]/g,'_')}.ics`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+// 待辦 → 帶鬧鈴的日曆事件（由系統行事曆發通知）
+function dlTodoICS(id) {
+  const t = state.todos.find(x => x.id === id);
+  if (!t?.due) return;
+  const s = icsDate(t.due);
+  if (!s) { showError('⚠ 期限日期無效'); return; }
+  const e = icsDate(new Date(new Date(t.due).getTime() + 30 * 60000).toISOString());
+  const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//lingguang//v4//ZH','BEGIN:VEVENT',
+    `UID:lingguang-todo-${t.id}@local`,
+    `DTSTAMP:${icsDate(new Date().toISOString())}`,
+    `DTSTART:${s}`,
+    `DTEND:${e}`,
+    `SUMMARY:${icsEsc('⏰ ' + t.text)}`,
+    'BEGIN:VALARM','ACTION:DISPLAY',
+    `DESCRIPTION:${icsEsc(t.text)}`,
+    'TRIGGER:-PT0M','END:VALARM',
+    'BEGIN:VALARM','ACTION:DISPLAY',
+    `DESCRIPTION:${icsEsc(t.text)}`,
+    'TRIGGER:-PT1H','END:VALARM',
+    'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const a = document.createElement('a');
+  const url = URL.createObjectURL(new Blob([ics], {type:'text/calendar'}));
+  a.href = url;
+  a.download = `提醒-${String(t.text).slice(0,20).replace(/[\\/:*?"<>|]/g,'_')}.ics`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+
+function renderEvents() {
+  const panel = document.getElementById('panel-events');
+  document.getElementById('countEvents').textContent = state.events.length;
+  if (!state.events.length) {
+    panel.innerHTML = `<div class="empty">尚無行程<br><span style="font-size:12px">說「下週三下午兩點…」AI 會解析後一鍵加入日曆</span></div>`;
+    return;
+  }
+  let html = '';
+  state.events.forEach(ev => {
+    const d = new Date(ev.start);
+    const valid = !isNaN(d);
+    const wk = valid ? ['日','一','二','三','四','五','六'][d.getDay()] : '';
+    const dateStr = valid
+      ? `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}（${wk}）${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`
+      : '⚠ 日期無效';
+    html += `<div class="event-item">
+      <div class="event-title">${esc(ev.title)}</div>
+      <div class="event-detail">
+        ${dateStr}
+        ${ev.location?`<br>📍 ${esc(ev.location)}`:''}
+        ${ev.description?`<br>${esc(ev.description)}`:''}
+      </div>
+      <div class="event-actions">
+        ${valid?`<a class="action-btn primary" href="${gcalUrl(ev)}" target="_blank" rel="noopener">📅 Google 日曆</a>
+        <span class="action-btn" onclick="dlICS(${ev.id})">⬇ Apple .ics</span>`:''}
+        ${playBtnHtml(ev.audioId, 'action-btn')}
+        <span class="action-btn muted" onclick="delEvent(${ev.id})">刪除</span>
+      </div>
+    </div>`;
+  });
+  panel.innerHTML = html;
+}
+async function delEvent(id) {
+  audioDel(state.events.find(x => x.id === id)?.audioId);
+  state.events = state.events.filter(x => x.id !== id);
+  await saveState(); renderAll();
+}
+
+// ════════ Notes ════════
+async function shareNote(id) {
+  const n = state.notes.find(x => x.id === id);
+  if (!n) return;
+  const text = n.summary + (n.expanded ? '\n\n── 行動計畫 ──\n' + n.expanded : '');
+  if (navigator.share) {
+    try { await navigator.share({ text }); return; } catch(e) {}
+  }
+  try { await navigator.clipboard.writeText(text); showSaveStatus('✓ 已複製'); }
+  catch(e) { prompt('長按複製：', text); }
+}
+
+// 想法 → AI 展開成行動計畫
+async function expandNote(id) {
+  const n = state.notes.find(x => x.id === id);
+  if (!n || n.expanding) return;
+  if (!getApiKey()) { openModal(); return; }
+  n.expanding = true;
+  renderAll();
+  const sys = `你是 Stanley（匠滑雪 TKR 創辦人）的行動策劃助手，繁體中文。
+把他的想法展開成具體可執行的行動計畫。只輸出純文字，不用 markdown 符號，格式：
+目標：一句話說清楚要達成什麼
+步驟：3到6步，每步一行、動詞開頭、具體到可以直接做
+今天就能做的第一步：一句話`;
+  try {
+    const input = n.summary + (n.raw && n.raw !== n.summary ? '\n\n（原始想法：' + n.raw + '）' : '');
+    const out = await callLLM(sys, input);
+    n.expanded = out.trim();
+  } catch(err) {
+    showError('⚠ 展開失敗：' + esc(err.message));
+  }
+  delete n.expanding;
+  await saveState();
+  renderAll();
+}
+
+function renderNotes() {
+  const panel = document.getElementById('panel-notes');
+  document.getElementById('countNotes').textContent = state.notes.length;
+  if (!state.notes.length) {
+    panel.innerHTML = `<div class="empty">尚無想法<br><span style="font-size:12px">純靈感、觀察、點子，AI 整理後存在這裡</span></div>`;
+    return;
+  }
+  let html = '';
+  state.notes.forEach(n => {
+    html += `<div class="note-item">
+      <div class="note-time">${fmtTime(n.time)}${n.error?' · ⚠ 未處理原文':''}</div>
+      ${n.raw && n.raw !== n.summary ? `<div class="note-raw">${esc(n.raw)}</div>` : ''}
+      <div class="note-body">${esc(n.summary)}</div>
+      ${n.expanded ? `<div class="note-expanded"><div class="note-expanded-label">🚀 行動計畫</div>${esc(n.expanded)}</div>` : ''}
+      <div class="note-actions">
+        ${n.expanding
+          ? `<span class="action-btn muted"><span class="spinner" style="width:11px;height:11px"></span>展開中…</span>`
+          : `<span class="action-btn" onclick="expandNote(${n.id})">🚀 ${n.expanded ? '重新展開' : '展開行動計畫'}</span>`}
+        <span class="action-btn" onclick="shareNote(${n.id})">📤 分享</span>
+        ${playBtnHtml(n.audioId, 'action-btn')}
+        <span class="action-btn muted" onclick="delNote(${n.id})">刪除</span>
+      </div>
+    </div>`;
+  });
+  panel.innerHTML = html;
+}
+async function delNote(id) {
+  audioDel(state.notes.find(x => x.id === id)?.audioId);
+  state.notes = state.notes.filter(x => x.id !== id);
+  await saveState(); renderAll();
+}
+
+// ════════ Init ════════
+if (!SR) document.getElementById('micBtn').style.opacity = '0.4';
+if (!canRecord) document.getElementById('recBtn').style.opacity = '0.4';
+setProvider(getProvider());
+loadState();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(() => {});
+</script>
+</body>
+</html>
