@@ -653,19 +653,13 @@ async function transcribeAndClassify(blob, audioId) {
   document.getElementById('inboxZone').appendChild(inbox);
   try {
     const b64 = await blobToB64(blob);
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODELS.gemini.model}:generateContent`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': gKey },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [
-          { text: '請將這段語音逐字轉錄為繁體中文文字。只輸出轉錄結果，不要任何說明或標點以外的文字。' },
-          { inline_data: { mime_type: blob.type.split(';')[0] || 'audio/webm', data: b64 } }
-        ]}],
-        generationConfig: { maxOutputTokens: 2048 }
-      })
+    const data = await geminiFetch({
+      contents: [{ role: 'user', parts: [
+        { text: '請將這段語音逐字轉錄為繁體中文文字。只輸出轉錄結果，不要任何說明或標點以外的文字。' },
+        { inline_data: { mime_type: blob.type.split(';')[0] || 'audio/webm', data: b64 } }
+      ]}],
+      generationConfig: { maxOutputTokens: 2048 }
     });
-    const data = await res.json();
-    if (!res.ok || data.error) throw new Error(data.error?.message || `Gemini HTTP ${res.status}`);
     const transcript = (data.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('').trim();
     inbox.remove();
     if (!transcript) throw new Error('轉錄結果為空');
@@ -682,22 +676,56 @@ async function saveVoiceNote(audioId, summary) {
 }
 
 // ════════ LLM 呼叫（Claude / Gemini）════════
-async function callLLM(systemPrompt, userText, wantJSON = true) {
-  const provider = getProvider();
-  const key = getApiKey(provider);
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-  if (provider === 'gemini') {
+// 把 API 錯誤翻成看得懂的中文
+function zhErr(msg, status) {
+  const m = String(msg || '');
+  if (status === 429 || /quota|rate.?limit/i.test(m))
+    return 'AI 額度暫時用完（免費版每分鐘有次數上限），等 1 分鐘再送一次就好';
+  if (/API key not valid|invalid x-api-key|authentication|unauthorized/i.test(m))
+    return 'API Key 無效，請按 ⚙️ 檢查金鑰有沒有貼對';
+  if (/overloaded|unavailable|503/i.test(m))
+    return 'AI 伺服器現在忙碌，過幾分鐘再試';
+  if (/credit|billing/i.test(m))
+    return 'API 額度不足，請到帳號後台檢查餘額';
+  return m || ('連線失敗（HTTP ' + status + '）');
+}
+
+// Gemini 請求：撞到每分鐘上限時自動等候重試（最多 2 次）
+async function geminiFetch(body) {
+  const key = getApiKey('gemini');
+  for (let attempt = 0; ; attempt++) {
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODELS.gemini.model}:generateContent`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-      body: JSON.stringify({
-        system_instruction: { parts: [{ text: systemPrompt }] },
-        contents: [{ role: 'user', parts: [{ text: userText }] }],
-        generationConfig: { maxOutputTokens: 1024, ...(wantJSON ? { responseMimeType: 'application/json' } : {}) }
-      })
+      body: JSON.stringify(body)
     });
-    const data = await res.json();
-    if (!res.ok || data.error) throw new Error(data.error?.message || `Gemini HTTP ${res.status}`);
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 429) {
+      const m = (data.error?.message || '').match(/retry in ([\d.]+)/i);
+      const wait = Math.min(Math.ceil(m ? parseFloat(m[1]) : 20) + 2, 65);
+      if (attempt < 2) {
+        showSaveStatus(`⏳ 額度滿，${wait} 秒後自動重試`);
+        await sleep(wait * 1000);
+        continue;
+      }
+      throw new Error(zhErr(data.error?.message, 429));
+    }
+    if (!res.ok || data.error) throw new Error(zhErr(data.error?.message, res.status));
+    return data;
+  }
+}
+
+async function callLLM(systemPrompt, userText, wantJSON = true) {
+  const provider = getProvider();
+
+  if (provider === 'gemini') {
+    const data = await geminiFetch({
+      system_instruction: { parts: [{ text: systemPrompt }] },
+      contents: [{ role: 'user', parts: [{ text: userText }] }],
+      generationConfig: { maxOutputTokens: 1024, ...(wantJSON ? { responseMimeType: 'application/json' } : {}) }
+    });
     const parts = data.candidates?.[0]?.content?.parts;
     if (!parts) throw new Error('Gemini 回應為空' + (data.candidates?.[0]?.finishReason ? `（${data.candidates[0].finishReason}）` : ''));
     return parts.map(p => p.text || '').join('');
@@ -708,7 +736,7 @@ async function callLLM(systemPrompt, userText, wantJSON = true) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': key,
+      'x-api-key': getApiKey('claude'),
       'anthropic-version': '2023-06-01',
       'anthropic-dangerous-direct-browser-access': 'true'
     },
@@ -719,8 +747,8 @@ async function callLLM(systemPrompt, userText, wantJSON = true) {
       messages: [{ role: 'user', content: userText }]
     })
   });
-  const data = await res.json();
-  if (!res.ok || data.error) throw new Error(data.error?.message || `Claude HTTP ${res.status}`);
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || data.error) throw new Error(zhErr(data.error?.message, res.status));
   return (data.content || []).map(b => b.text || '').join('');
 }
 
