@@ -682,7 +682,7 @@ async function saveVoiceNote(audioId, summary) {
 }
 
 // ════════ LLM 呼叫（Claude / Gemini）════════
-async function callLLM(systemPrompt, userText) {
+async function callLLM(systemPrompt, userText, wantJSON = true) {
   const provider = getProvider();
   const key = getApiKey(provider);
 
@@ -693,7 +693,7 @@ async function callLLM(systemPrompt, userText) {
       body: JSON.stringify({
         system_instruction: { parts: [{ text: systemPrompt }] },
         contents: [{ role: 'user', parts: [{ text: userText }] }],
-        generationConfig: { maxOutputTokens: 1024, responseMimeType: 'application/json' }
+        generationConfig: { maxOutputTokens: 1024, ...(wantJSON ? { responseMimeType: 'application/json' } : {}) }
       })
     });
     const data = await res.json();
@@ -742,9 +742,17 @@ async function processIdea(rawText, audioId) {
   const now = new Date();
   const weekday = ['日','一','二','三','四','五','六'][now.getDay()];
   const nowStr = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} 週${weekday} ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')} (Asia/Taipei, UTC+8)`;
+  let dateTable = '';
+  for (let i = 0; i < 15; i++) {
+    const d = new Date(now.getTime() + i * 86400000);
+    dateTable += `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()}＝週${['日','一','二','三','四','五','六'][d.getDay()]}${i===0?'（今天）':''}${i===1?'（明天）':''}\n`;
+  }
 
   const systemPrompt = `你是想法分類引擎。使用者是 Stanley，匠滑雪 TKR 創辦人，繁體中文使用者。
 現在時間：${nowStr}
+
+未來15天日期對照表（換算「下週三」「這週末」「明天」等相對時間時，必須查這個表，禁止自己推算）：
+${dateTable}
 
 只回傳純 JSON，絕對不能有 markdown、代碼框或任何其他文字。格式：
 {
@@ -967,6 +975,26 @@ async function shareNote(id) {
   catch(e) { prompt('長按複製：', text); }
 }
 
+// 想法 → 交給手機上的 AI app 實際執行
+function aiHandoffText(n) {
+  return `請實際幫我執行這個任務（需要的話請上網搜尋、給我具體結果）：\n\n${n.summary}${n.expanded ? '\n\n已擬好的行動計畫：\n' + n.expanded : ''}`;
+}
+function handoffClaude(id) {
+  const n = state.notes.find(x => x.id === id);
+  if (!n) return;
+  window.open('https://claude.ai/new?q=' + encodeURIComponent(aiHandoffText(n)), '_blank');
+}
+async function handoffShare(id) {
+  const n = state.notes.find(x => x.id === id);
+  if (!n) return;
+  const text = aiHandoffText(n);
+  if (navigator.share) {
+    try { await navigator.share({ text }); return; } catch(e) {}
+  }
+  try { await navigator.clipboard.writeText(text); showSaveStatus('✓ 已複製，貼到 AI app'); }
+  catch(e) { prompt('長按複製，貼到 AI app：', text); }
+}
+
 // 想法 → AI 展開成行動計畫
 async function expandNote(id) {
   const n = state.notes.find(x => x.id === id);
@@ -981,7 +1009,7 @@ async function expandNote(id) {
 今天就能做的第一步：一句話`;
   try {
     const input = n.summary + (n.raw && n.raw !== n.summary ? '\n\n（原始想法：' + n.raw + '）' : '');
-    const out = await callLLM(sys, input);
+    const out = await callLLM(sys, input, false); // 純文字模式，不要 JSON
     n.expanded = out.trim();
   } catch(err) {
     showError('⚠ 展開失敗：' + esc(err.message));
@@ -1009,6 +1037,8 @@ function renderNotes() {
         ${n.expanding
           ? `<span class="action-btn muted"><span class="spinner" style="width:11px;height:11px"></span>展開中…</span>`
           : `<span class="action-btn" onclick="expandNote(${n.id})">🚀 ${n.expanded ? '重新展開' : '展開行動計畫'}</span>`}
+        <span class="action-btn primary" onclick="handoffShare(${n.id})">🤖 交給 AI 執行</span>
+        <span class="action-btn" onclick="handoffClaude(${n.id})">💬 用 Claude 開啟</span>
         <span class="action-btn" onclick="shareNote(${n.id})">📤 分享</span>
         ${playBtnHtml(n.audioId, 'action-btn')}
         <span class="action-btn muted" onclick="delNote(${n.id})">刪除</span>
