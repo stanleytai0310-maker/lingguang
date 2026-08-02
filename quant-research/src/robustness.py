@@ -56,19 +56,21 @@ def param_sensitivity(df):
 
 
 def stationary_bootstrap(x: np.ndarray, n_boot=2000, mean_block=20):
-    """Politis-Romano stationary bootstrap of a daily return series.
-    Returns p-value for H0: mean <= 0 (one-sided) and Sharpe distribution."""
+    """Politis-Romano stationary bootstrap of a daily return series
+    (vectorized). Returns the real Sharpe and a one-sided p-value under H0:
+    true mean <= 0 (series demeaned before resampling)."""
     n = len(x)
     p = 1 / mean_block
+    demeaned = x - x.mean()
     sharpes = np.empty(n_boot)
-    demeaned = x - x.mean()  # bootstrap under H0
+    ar = np.arange(n)
     for b in range(n_boot):
-        idx = np.empty(n, dtype=int)
-        idx[0] = RNG.integers(n)
         jump = RNG.random(n) < p
-        steps = RNG.integers(0, n, size=n)
-        for i in range(1, n):
-            idx[i] = steps[i] if jump[i] else (idx[i - 1] + 1) % n
+        jump[0] = True
+        seg_first = np.maximum.accumulate(np.where(jump, ar, 0))  # segment head index
+        starts = RNG.integers(0, n, size=n)  # random start drawn at each position
+        seg_start = starts[seg_first]        # keep the one drawn at the segment head
+        idx = (seg_start + (ar - seg_first)) % n
         s = demeaned[idx]
         sd = s.std()
         sharpes[b] = (s.mean() / sd * np.sqrt(bt.TRADING_DAYS)) if sd > 0 else 0.0

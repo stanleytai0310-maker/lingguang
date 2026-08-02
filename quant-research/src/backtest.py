@@ -39,6 +39,10 @@ def run(df: pd.DataFrame, sig: pd.Series, extra_lag: int = 0,
     out["pos"] = pos
     out["gross"] = pos * df["tx_ret"].fillna(0)
     turnover = pos.diff().abs().fillna(pos.abs())
+    # rolling a live position over settlement day = close old + open new
+    if "tx_roll" in df.columns:
+        roll = df["tx_roll"].astype(bool).astype(float)
+        turnover = turnover + 2 * pos.abs() * roll
     cps = cost_per_side_frac(df["tx_close"], slippage_pts, commission_ntd,
                              tax_rate, point_value)
     out["cost"] = turnover * cps
