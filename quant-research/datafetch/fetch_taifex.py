@@ -65,13 +65,33 @@ def post_csv(url: str, data: dict, tag: str, tries: int = 4,
 
 
 def parse_csv_text(txt: str) -> pd.DataFrame | None:
-    lines = [l for l in txt.splitlines() if l.strip()]
+    """TAIFEX CSVs end data rows with a trailing comma (one field more than
+    the header), which makes pandas silently treat column 1 (the date) as an
+    index — and lose it on save. Parse with csv.reader and pad/trim each row
+    to the header length instead."""
+    import csv as _csv
+    lines = [l for l in txt.splitlines() if l.strip() and not l.lstrip().startswith("<")]
     if len(lines) < 2:
         return None
     try:
-        return pd.read_csv(io.StringIO("\n".join(lines)), thousands=",")
+        parsed = list(_csv.reader(lines))
     except Exception:  # noqa: BLE001
         return None
+    header = [h.strip() for h in parsed[0] if h.strip() != ""]
+    n = len(header)
+    if n < 2:
+        return None
+    rows = []
+    for p in parsed[1:]:
+        cells = [c.strip() for c in p]
+        if len(cells) > n:
+            cells = cells[:n]
+        elif len(cells) < n:
+            cells += [""] * (n - len(cells))
+        rows.append(cells)
+    if not rows:
+        return None
+    return pd.DataFrame(rows, columns=header)
 
 
 def fetch_monthly(url, base_data, date_keys, start, end, tag, workers=3,

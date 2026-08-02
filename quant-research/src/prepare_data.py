@@ -28,11 +28,10 @@ def _norm_cols(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _num(s):
-    return pd.to_numeric(
-        s.astype(str).str.replace(",", "").str.replace("-", "", regex=False).replace("", np.nan)
-        if s.dtype == object else s,
-        errors="coerce",
-    )
+    if s.dtype != object:
+        return pd.to_numeric(s, errors="coerce")
+    t = s.astype(str).str.strip().str.replace(",", "")
+    return pd.to_numeric(t, errors="coerce")  # lone "-" (missing) coerces to NaN
 
 
 def third_wednesday(year: int, month: int) -> pd.Timestamp:
