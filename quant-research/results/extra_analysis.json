@@ -1,108 +1,108 @@
 {
   "ma_20_60_lo": {
     "full": {
-      "beta": 0.44,
-      "alpha_ann_pct": 3.92,
-      "IR": 0.34,
-      "t_alpha": 1.84
+      "beta": 0.46,
+      "alpha_ann_pct": 4.36,
+      "IR": 0.37,
+      "t_alpha": 1.97
     },
-    "OOS": {
-      "beta": 0.61,
-      "alpha_ann_pct": 4.31,
-      "IR": 0.43,
-      "t_alpha": 1.28
+    "post2018": {
+      "beta": 0.64,
+      "alpha_ann_pct": 4.08,
+      "IR": 0.41,
+      "t_alpha": 1.19
     }
   },
   "rsi2_lo": {
     "full": {
-      "beta": 0.12,
-      "alpha_ann_pct": 2.65,
-      "IR": 0.35,
-      "t_alpha": 1.88
+      "beta": 0.13,
+      "alpha_ann_pct": 2.0,
+      "IR": 0.25,
+      "t_alpha": 1.33
     },
-    "OOS": {
-      "beta": 0.18,
-      "alpha_ann_pct": 5.21,
-      "IR": 0.67,
-      "t_alpha": 1.98
+    "post2018": {
+      "beta": 0.19,
+      "alpha_ann_pct": 3.54,
+      "IR": 0.43,
+      "t_alpha": 1.25
     }
   },
   "tom_1_3": {
     "full": {
       "beta": 0.21,
-      "alpha_ann_pct": 1.44,
-      "IR": 0.15,
-      "t_alpha": 0.82
+      "alpha_ann_pct": 1.09,
+      "IR": 0.11,
+      "t_alpha": 0.6
     },
-    "OOS": {
-      "beta": 0.26,
-      "alpha_ann_pct": 0.74,
-      "IR": 0.08,
-      "t_alpha": 0.24
+    "post2018": {
+      "beta": 0.24,
+      "alpha_ann_pct": 1.54,
+      "IR": 0.17,
+      "t_alpha": 0.51
     }
   },
   "basis_z120_ls": {
     "full": {
       "beta": 0.11,
-      "alpha_ann_pct": 7.35,
-      "IR": 0.55,
-      "t_alpha": 2.96
+      "alpha_ann_pct": 8.57,
+      "IR": 0.61,
+      "t_alpha": 3.21
     },
-    "OOS": {
-      "beta": 0.16,
-      "alpha_ann_pct": -1.2,
-      "IR": -0.1,
-      "t_alpha": -0.29
+    "post2018": {
+      "beta": 0.19,
+      "alpha_ann_pct": -1.09,
+      "IR": -0.08,
+      "t_alpha": -0.24
     }
   },
   "pcr_oi_ls": {
     "full": {
-      "beta": -0.15,
-      "alpha_ann_pct": 7.04,
-      "IR": 0.42,
-      "t_alpha": 2.23
-    },
-    "OOS": {
-      "beta": 0.22,
-      "alpha_ann_pct": 7.91,
+      "beta": -0.16,
+      "alpha_ann_pct": 7.99,
       "IR": 0.47,
-      "t_alpha": 1.38
+      "t_alpha": 2.47
+    },
+    "post2018": {
+      "beta": 0.19,
+      "alpha_ann_pct": 5.52,
+      "IR": 0.32,
+      "t_alpha": 0.92
     }
   },
   "donchian_55_20_ls": {
     "full": {
-      "beta": -0.17,
-      "alpha_ann_pct": 6.76,
-      "IR": 0.36,
-      "t_alpha": 1.94
+      "beta": -0.14,
+      "alpha_ann_pct": 5.8,
+      "IR": 0.3,
+      "t_alpha": 1.59
     },
-    "OOS": {
-      "beta": 0.05,
-      "alpha_ann_pct": 10.79,
-      "IR": 0.63,
-      "t_alpha": 1.86
+    "post2018": {
+      "beta": 0.11,
+      "alpha_ann_pct": 10.16,
+      "IR": 0.59,
+      "t_alpha": 1.7
     }
   },
   "combo_3": {
     "full": {
-      "ann_pct": 5.6,
-      "sharpe": 0.68,
-      "max_dd_pct": -19.3
+      "ann_pct": 5.48,
+      "sharpe": 0.65,
+      "max_dd_pct": -24.0
     },
-    "OOS": {
-      "ann_pct": 11.26,
-      "sharpe": 1.23,
-      "max_dd_pct": -12.4
+    "post2018": {
+      "ann_pct": 11.22,
+      "sharpe": 1.21,
+      "max_dd_pct": -13.7
     }
   },
   "combo_corr": {
     "ma_20_60_lo": {
       "ma_20_60_lo": 1.0,
-      "rsi2_lo": 0.46,
+      "rsi2_lo": 0.42,
       "tom_1_3": 0.34
     },
     "rsi2_lo": {
-      "ma_20_60_lo": 0.46,
+      "ma_20_60_lo": 0.42,
       "rsi2_lo": 1.0,
       "tom_1_3": 0.15
     },
@@ -113,10 +113,10 @@
     }
   },
   "crash_2026": {
-    "buy_hold": 9.6,
-    "ma_20_60_lo": 9.6,
-    "rsi2_lo": 19.6,
-    "basis_z120_ls": -1.7,
-    "combo": 13.6
+    "buy_hold": 9.5,
+    "ma_20_60_lo": 9.5,
+    "rsi2_lo": 20.8,
+    "basis_z120_ls": 12.0,
+    "combo_3": 11.5
   }
 }

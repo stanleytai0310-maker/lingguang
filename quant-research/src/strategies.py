@@ -29,21 +29,21 @@ def buy_hold(df):
 # ── trend / momentum ─────────────────────────────────────────────────────
 
 def ma_cross(df, fast=20, slow=60, short=True):
-    f = df["tx_close"].rolling(fast).mean()
-    s = df["tx_close"].rolling(slow).mean()
+    f = df["tx_adj_close"].rolling(fast).mean()
+    s = df["tx_adj_close"].rolling(slow).mean()
     sig = pd.Series(np.where(f > s, 1.0, -1.0 if short else 0.0), index=df.index)
     sig[s.isna()] = 0.0
     return sig, 0
 
 
 def donchian(df, entry=20, exit_=10, short=True):
-    hi = df["tx_high"].rolling(entry).max().shift(1)
-    lo = df["tx_low"].rolling(entry).min().shift(1)
-    xhi = df["tx_high"].rolling(exit_).max().shift(1)
-    xlo = df["tx_low"].rolling(exit_).min().shift(1)
+    hi = df["tx_adj_high"].rolling(entry).max().shift(1)
+    lo = df["tx_adj_low"].rolling(entry).min().shift(1)
+    xhi = df["tx_adj_high"].rolling(exit_).max().shift(1)
+    xlo = df["tx_adj_low"].rolling(exit_).min().shift(1)
     sig = np.zeros(len(df))
     cur = 0.0
-    c = df["tx_close"].values
+    c = df["tx_adj_close"].values
     for i in range(len(df)):
         if np.isnan(hi.iloc[i]) or np.isnan(lo.iloc[i]):
             sig[i] = 0.0
@@ -62,7 +62,7 @@ def donchian(df, entry=20, exit_=10, short=True):
 
 
 def tsmom(df, lookback=120, short=True):
-    mom = df["tx_close"].pct_change(lookback)
+    mom = df["tx_adj_close"].pct_change(lookback)
     sig = pd.Series(np.where(mom > 0, 1.0, -1.0 if short else 0.0), index=df.index)
     sig[mom.isna()] = 0.0
     return sig, 0
@@ -71,9 +71,9 @@ def tsmom(df, lookback=120, short=True):
 # ── mean reversion ───────────────────────────────────────────────────────
 
 def rsi2_reversion(df, buy_th=10, exit_th=60, trend_ma=200, short=True):
-    rsi = _rsi(df["tx_close"], 2)
-    ma = df["tx_close"].rolling(trend_ma).mean()
-    above = df["tx_close"] > ma
+    rsi = _rsi(df["tx_adj_close"], 2)
+    ma = df["tx_adj_close"].rolling(trend_ma).mean()
+    above = df["tx_adj_close"] > ma
     sig = np.zeros(len(df))
     cur = 0.0
     for i in range(len(df)):
@@ -94,14 +94,14 @@ def rsi2_reversion(df, buy_th=10, exit_th=60, trend_ma=200, short=True):
 
 
 def boll_reversion(df, n=20, k=2.0, trend_ma=200):
-    ma = df["tx_close"].rolling(n).mean()
-    sd = df["tx_close"].rolling(n).std()
-    trend = df["tx_close"].rolling(trend_ma).mean()
+    ma = df["tx_adj_close"].rolling(n).mean()
+    sd = df["tx_adj_close"].rolling(n).std()
+    trend = df["tx_adj_close"].rolling(trend_ma).mean()
     lower = ma - k * sd
     upper = ma + k * sd
     sig = np.zeros(len(df))
     cur = 0.0
-    c = df["tx_close"]
+    c = df["tx_adj_close"]
     for i in range(len(df)):
         if np.isnan(lower.iloc[i]) or np.isnan(trend.iloc[i]):
             sig[i] = 0.0
@@ -132,8 +132,9 @@ def turn_of_month(df, before=1, after=3):
     for m, idxs in pos_in_month.items():
         for j in idxs[:after]:            # first `after` sessions of month
             sig[j] = 1.0
-        for j in idxs[-before:]:          # last `before` sessions of month
-            sig[j] = 1.0
+        if before > 0:
+            for j in idxs[-before:]:      # last `before` sessions of month
+                sig[j] = 1.0
     return pd.Series(sig, index=df.index), 0
 
 
@@ -179,7 +180,7 @@ def mtx_retail(df, z_win=120, th=1.5, short=True):
     inst_cols = [c for c in df.columns if c.startswith("MXF_")]
     if not inst_cols or "mtx_total_oi" not in df.columns:
         return pd.Series(0.0, index=df.index), 1
-    inst_net = df[inst_cols].sum(axis=1)
+    inst_net = df[inst_cols].sum(axis=1, min_count=len(inst_cols))
     ratio = -inst_net / df["mtx_total_oi"]
     z = (ratio - ratio.rolling(z_win).mean()) / ratio.rolling(z_win).std()
     # retail extremely short → long; extremely long → short
@@ -223,6 +224,9 @@ REGISTRY = {
     "rsi2_ls": (rsi2_reversion, {"short": True}),
     "boll_20_2_ls": (boll_reversion, {}),
     "tom_1_3": (turn_of_month, {}),
+    # hindsight-free variant: no month-end leg ("last N sessions" needs the
+    # exchange calendar ex ante; unscheduled closures make it look-ahead)
+    "tom_0_3": (turn_of_month, {"before": 0, "after": 3}),
     "foreign_z60_ls": (foreign_oi, {"z_win": 60, "short": True}),
     "foreign_level_ls": (foreign_oi_level, {"short": True}),
     "foreign_level_lo": (foreign_oi_level, {"short": False}),

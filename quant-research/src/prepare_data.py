@@ -100,10 +100,13 @@ def build_continuous(fut: pd.DataFrame) -> pd.DataFrame:
     # session decomposition (same contract): overnight = prev close → today open
     front["ret_overnight"] = front["open"] / front["prev_close_same_contract"] - 1
     front["ret_intraday"] = front["close"] / front["open"] - 1
-    # log-style back-adjusted level for charts
-    front["adj_level"] = front["close"].iloc[-1] * np.exp(
-        -(np.log1p(front["ret"].fillna(0))[::-1].cumsum()[::-1] - np.log1p(front["ret"].fillna(0)))
-    ) if len(front) else np.nan
+    # back-adjusted prices (roll gaps removed, anchored to the latest close).
+    # Indicators MUST use these: the raw close series carries ~-0.3% per roll
+    # (deeper in dividend season), which fake-trends price-based signals.
+    gross = (1 + front["ret"].fillna(0)).cumprod()
+    front["adj_close"] = front["close"].iloc[-1] * gross / gross.iloc[-1]
+    for c in ["open", "high", "low"]:
+        front[f"adj_{c}"] = front["adj_close"] * front[c] / front["close"]
     front["roll"] = front["expiry"].ne(front["expiry"].shift(1))
     return front
 

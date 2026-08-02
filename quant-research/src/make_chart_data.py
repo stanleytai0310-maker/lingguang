@@ -41,14 +41,15 @@ def main():
     sess = pd.DataFrame({"date": m["date"], "overnight": on, "intraday": intr})
     payload["session_cum"] = weekly(sess, ["overnight", "intraday"])
 
-    isoos = pd.read_csv(RESULTS / "is_oos.csv")
+    split = pd.read_csv(RESULTS / "subsample_split.csv")
     keep = ["basis_z120_ls", "ma_20_60_lo", "rsi2_lo", "buy_hold", "tom_1_3",
-            "pcr_oi_ls", "donchian_55_20_ls", "ma_50_200_lo"]
-    piv = isoos[isoos["name"].isin(keep)].pivot_table(index="name", columns="window",
+            "pcr_oi_ls", "donchian_55_20_ls", "ma_50_200_lo", "tsmom_60_ls"]
+    piv = split[split["name"].isin(keep)].pivot_table(index="name", columns="window",
                                                       values="sharpe")
-    payload["is_oos_sharpe"] = {n: {"IS": round(float(r["IS"]), 2),
-                                    "OOS": round(float(r["OOS"]), 2)}
-                                for n, r in piv.iterrows()}
+    piv = piv.dropna(subset=["pre2018", "post2018"])
+    payload["prepost_sharpe"] = {n: {"pre": round(float(r["pre2018"]), 2),
+                                     "post": round(float(r["post2018"]), 2)}
+                                 for n, r in piv.iterrows()}
 
     (RESULTS / "chart_data.json").write_text(json.dumps(payload))
     sizes = {k: len(json.dumps(v)) for k, v in payload.items()}

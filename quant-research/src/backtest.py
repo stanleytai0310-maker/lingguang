@@ -4,45 +4,99 @@
 Conventions
 -----------
 - `sig` is the desired position in [-1, 0, 1] decided using information
-  available at the close of day t (or earlier).
-- Execution: positions take effect at the NEXT close (`extra_lag=0`,
-  i.e. contribution_t = sig.shift(1) * ret_t). Data published after the
-  day-session close (institutional flows, PCR) should use `extra_lag=1`,
-  making the effective shift 2 days — deliberately conservative.
-- `ret` must be same-contract close-to-close returns of the continuous
-  front-month series (roll jumps excluded by construction).
+  available at the close of day t (flows published ~15:00 the same day still
+  precede the next morning's open).
+- Execution modes:
+    execution="next_open" (default): a signal from close t is filled at the
+      open of t+1. Day PnL = prev position x overnight return + new position
+      x intraday return (same-contract legs). This is executable in every
+      era (pre-2017 there was no after-hours session, so nothing can be
+      filled AT the close that produced the signal).
+    execution="close": fill at the same close that produced the signal
+      (optimistic legacy convention; kept for sensitivity comparison).
+- extra_lag adds full-day delays on top (signals from data published with a
+  longer lag).
+- Limit-locked days: when a day trades at a single price (open==high==low),
+  no fill is possible; position changes are deferred to the next tradable
+  day (the desired position is re-evaluated, not queued).
+- `ret` columns must be same-contract returns of the continuous front-month
+  series (roll jumps excluded by construction).
 - Costs are charged per side on every position change:
     cost_frac = (slippage_pts + commission_ntd / point_value) / price + tax_rate
+  Rolling a live position over settlement pays |old|+|new| sides (close the
+  old contract, open the new one); a same-day position change is subsumed
+  in that (not double-charged).
   Defaults: 1.0 pt slippage, NT$60 commission, tax 2e-5, TX point = NT$200.
+  slippage_pts may be a Series (state-dependent slippage).
 """
 from __future__ import annotations
 
 import numpy as np
 import pandas as pd
 
-TRADING_DAYS = 240  # Taiwan market ~240-250 sessions/yr
+TRADING_DAYS = 248  # Taiwan market averages ~248 sessions/yr (1999-2026 data)
 
 
-def cost_per_side_frac(price: pd.Series, slippage_pts: float = 1.0,
+def cost_per_side_frac(price: pd.Series, slippage_pts=1.0,
                        commission_ntd: float = 60.0, tax_rate: float = 2e-5,
                        point_value: float = 200.0) -> pd.Series:
     return (slippage_pts + commission_ntd / point_value) / price + tax_rate
 
 
+def _locked_days(df: pd.DataFrame) -> pd.Series:
+    """Full-day limit locks: the day traded at a single price."""
+    if {"tx_open", "tx_high", "tx_low"} <= set(df.columns):
+        return (df["tx_open"] == df["tx_high"]) & (df["tx_high"] == df["tx_low"])
+    return pd.Series(False, index=df.index)
+
+
+def _effective_pos(desired: pd.Series, locked: pd.Series) -> pd.Series:
+    """Defer position changes on locked days to the next tradable day."""
+    return desired.mask(locked).ffill().fillna(0)
+
+
+def _turnover(pos: pd.Series, roll: pd.Series | None) -> pd.Series:
+    prev = pos.shift(1).fillna(0)
+    t = (pos - prev).abs()
+    if roll is not None:
+        r = roll.astype(bool)
+        t = t.where(~r, prev.abs() + pos.abs())
+    return t
+
+
 def run(df: pd.DataFrame, sig: pd.Series, extra_lag: int = 0,
-        slippage_pts: float = 1.0, commission_ntd: float = 60.0,
-        tax_rate: float = 2e-5, point_value: float = 200.0) -> pd.DataFrame:
-    """df needs columns: tx_close, tx_ret. Returns per-day frame."""
+        execution: str = "next_open", slippage_pts=1.0,
+        commission_ntd: float = 60.0, tax_rate: float = 2e-5,
+        point_value: float = 200.0) -> pd.DataFrame:
+    """df needs: tx_close, tx_ret (+ tx_ret_overnight/tx_ret_intraday and
+    tx_open/high/low for next_open mode; tx_roll for roll costs)."""
     out = pd.DataFrame(index=df.index)
     out["date"] = df["date"].values
-    pos = sig.reindex(df.index).fillna(0).clip(-1, 1).shift(1 + extra_lag).fillna(0)
-    out["pos"] = pos
-    out["gross"] = pos * df["tx_ret"].fillna(0)
-    turnover = pos.diff().abs().fillna(pos.abs())
-    # rolling a live position over settlement day = close old + open new
-    if "tx_roll" in df.columns:
-        roll = df["tx_roll"].astype(bool).astype(float)
-        turnover = turnover + 2 * pos.abs() * roll
+    locked = _locked_days(df)
+    roll = df["tx_roll"] if "tx_roll" in df.columns else None
+    base = sig.reindex(df.index).fillna(0).clip(-1, 1)
+
+    if execution == "next_open":
+        # signal from close t-1 (already delayed extra_lag days) fills at open t
+        desired = base.shift(1 + extra_lag).fillna(0)
+        pos_open = _effective_pos(desired, locked)
+        prev = pos_open.shift(1).fillna(0)
+        on = df.get("tx_ret_overnight", pd.Series(0.0, index=df.index)).fillna(0)
+        intra = df.get("tx_ret_intraday", df["tx_ret"]).fillna(0)
+        out["pos"] = pos_open
+        out["gross"] = prev * on + pos_open * intra
+        turnover = _turnover(pos_open, roll)
+    elif execution == "close":
+        # optimistic legacy convention: the (lagged) signal fills at the very
+        # close it is computed from; pos_t is held from close t to close t+1
+        desired = base.shift(extra_lag).fillna(0)
+        pos = _effective_pos(desired, locked)
+        out["pos"] = pos
+        out["gross"] = pos.shift(1).fillna(0) * df["tx_ret"].fillna(0)
+        turnover = _turnover(pos, roll)
+    else:
+        raise ValueError(f"unknown execution mode {execution!r}")
+
     cps = cost_per_side_frac(df["tx_close"], slippage_pts, commission_ntd,
                              tax_rate, point_value)
     out["cost"] = turnover * cps
@@ -53,21 +107,23 @@ def run(df: pd.DataFrame, sig: pd.Series, extra_lag: int = 0,
 
 def run_session(df: pd.DataFrame, which: str = "overnight", direction: int = 1,
                 sig: pd.Series | None = None, extra_lag: int = 0,
-                slippage_pts: float = 1.0, commission_ntd: float = 60.0,
+                slippage_pts=1.0, commission_ntd: float = 60.0,
                 tax_rate: float = 2e-5, point_value: float = 200.0) -> pd.DataFrame:
-    """Session-hold backtest: enter and exit within each day.
+    """Session-hold backtest (enter and exit within each day).
 
-    which='overnight': long prev close → today open (uses tx_ret_overnight).
-    which='intraday' : long today open → today close (uses tx_ret_intraday).
-    Every active day pays TWO sides of costs. `sig` (0/1 filter, default all
-    days) is lagged like the main engine to avoid lookahead.
+    which='overnight': long prev close -> today open (tx_ret_overnight).
+    which='intraday' : long today open -> today close (tx_ret_intraday).
+    Every active day pays TWO sides of costs. Fully locked days are skipped
+    (no entry). Results are highly slippage-sensitive; see cost sensitivity.
     """
     col = f"tx_ret_{which}"
     out = pd.DataFrame(index=df.index)
     out["date"] = df["date"].values
     if sig is None:
         sig = pd.Series(1.0, index=df.index)
+    locked = _locked_days(df)
     active = sig.reindex(df.index).fillna(0).clip(0, 1).shift(1 + extra_lag).fillna(0)
+    active = active.where(~locked, 0.0)
     out["pos"] = active * direction
     out["gross"] = out["pos"] * df[col].fillna(0)
     cps = cost_per_side_frac(df["tx_close"], slippage_pts, commission_ntd,
@@ -101,13 +157,16 @@ def trades_from(bt: pd.DataFrame) -> pd.DataFrame:
 
 
 def stats(bt: pd.DataFrame, name: str = "") -> dict:
+    """Sharpe is the ARITHMETIC daily mean/std annualized by sqrt(248) —
+    the estimator the bootstrap and DSR formulas are derived for.
+    cagr_pct is the geometric annualized return (what compounding pays)."""
     net = bt["net"]
     n = len(net)
     if n < 10:
         return {"name": name, "n_days": n}
-    ann_ret = (1 + net).prod() ** (TRADING_DAYS / n) - 1
+    cagr = (1 + net).prod() ** (TRADING_DAYS / n) - 1
     ann_vol = net.std() * np.sqrt(TRADING_DAYS)
-    sharpe = ann_ret / ann_vol if ann_vol > 0 else np.nan
+    sharpe = (net.mean() / net.std() * np.sqrt(TRADING_DAYS)) if net.std() > 0 else np.nan
     tstat = net.mean() / (net.std() / np.sqrt(n)) if net.std() > 0 else np.nan
     tr = trades_from(bt)
     years = n / TRADING_DAYS
@@ -116,7 +175,7 @@ def stats(bt: pd.DataFrame, name: str = "") -> dict:
         "start": str(bt["date"].iloc[0].date()) if hasattr(bt["date"].iloc[0], "date") else str(bt["date"].iloc[0]),
         "end": str(bt["date"].iloc[-1].date()) if hasattr(bt["date"].iloc[-1], "date") else str(bt["date"].iloc[-1]),
         "n_days": n,
-        "ann_ret_pct": round(ann_ret * 100, 2),
+        "cagr_pct": round(cagr * 100, 2),
         "ann_vol_pct": round(ann_vol * 100, 2),
         "sharpe": round(float(sharpe), 3),
         "max_dd_pct": round(_max_drawdown(bt["equity"]) * 100, 2),

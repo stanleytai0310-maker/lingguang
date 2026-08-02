@@ -1,0 +1,527 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>台指期量化研究與驗證 · 1998–2026</title>
+<style>
+:root{
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --baseline:#c3c2b7; --border:rgba(11,11,11,.10);
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+  --good:#006300; --bad:#d03b3b; --warn:#ec835a; --accent:#2a78d6;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:where(:not([data-theme="light"])){
+    --page:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,.10);
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+    --good:#0ca30c; --bad:#e66767; --warn:#ec835a; --accent:#3987e5;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --page:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --baseline:#383835; --border:rgba(255,255,255,.10);
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500;
+  --good:#0ca30c; --bad:#e66767; --warn:#ec835a; --accent:#3987e5;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --baseline:#c3c2b7; --border:rgba(11,11,11,.10);
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100;
+  --good:#006300; --bad:#d03b3b; --warn:#ec835a; --accent:#2a78d6;
+  color-scheme:light;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--page); color:var(--ink);
+  font-family:-apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei","Segoe UI",sans-serif;
+  line-height:1.75; font-size:16px;
+}
+.wrap{max-width:940px;margin:0 auto;padding:0 22px 96px}
+a{color:var(--accent)}
+/* ── hero ── */
+header{padding:72px 0 30px;border-bottom:1px solid var(--grid)}
+.eyebrow{font-size:12px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-bottom:14px}
+h1{font-size:clamp(30px,5vw,44px);line-height:1.2;font-weight:700;letter-spacing:-.01em;text-wrap:balance}
+.sub{color:var(--ink2);margin-top:14px;max-width:44em}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.badge{font-size:12.5px;padding:4px 12px;border:1px solid var(--border);border-radius:999px;
+  color:var(--ink2);background:var(--surface);font-variant-numeric:tabular-nums}
+/* ── verdict cards ── */
+.verdicts{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:34px 0 8px}
+.vcard{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px}
+.vcard h3{font-size:14px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.vcard p{font-size:13.8px;color:var(--ink2)}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+/* ── sections ── */
+section{margin-top:64px}
+.secno{font-size:12px;letter-spacing:.14em;color:var(--accent);font-weight:600;margin-bottom:6px;
+  font-variant-numeric:tabular-nums}
+h2{font-size:24px;font-weight:700;letter-spacing:-.005em;margin-bottom:14px;text-wrap:balance}
+h3{font-size:17px;font-weight:600;margin:26px 0 8px}
+p{margin:10px 0;max-width:46em;color:var(--ink)}
+p.dim,li.dim{color:var(--ink2)}
+ul,ol{margin:10px 0 10px 1.4em;max-width:44em}
+li{margin:5px 0}
+strong{font-weight:600}
+.note{font-size:13.5px;color:var(--muted);border-left:2px solid var(--grid);padding-left:12px;margin:14px 0;max-width:44em}
+/* ── stat tiles ── */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:18px 0}
+.tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.tile .k{font-size:12.5px;color:var(--muted)}
+.tile .v{font-size:24px;font-weight:700;margin-top:2px;letter-spacing:-.01em}
+.tile .s{font-size:12px;color:var(--ink2);margin-top:2px;font-variant-numeric:tabular-nums}
+.pos{color:var(--good)} .neg{color:var(--bad)}
+/* ── tables ── */
+.tblwrap{overflow-x:auto;margin:16px 0;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13.6px}
+th{font-size:12px;color:var(--muted);text-align:right;font-weight:500;padding:9px 12px;
+  border-bottom:1px solid var(--grid);white-space:nowrap}
+th:first-child{text-align:left}
+td{padding:7px 12px;border-bottom:1px solid var(--grid);text-align:right;white-space:nowrap;color:var(--ink2)}
+td.num{font-variant-numeric:tabular-nums;color:var(--ink)}
+td.tname{text-align:left;color:var(--ink)}
+.tid{display:block;font-size:11px;color:var(--muted);font-family:ui-monospace,Menlo,monospace}
+tr:last-child td{border-bottom:none}
+/* ── charts ── */
+.chart{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:18px 18px 10px;margin:18px 0}
+.chart h4{font-size:14.5px;font-weight:600}
+.chart .csub{font-size:12.5px;color:var(--muted);margin-top:1px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin:10px 0 2px;font-size:12.5px;color:var(--ink2)}
+.legend .li{display:flex;align-items:center;gap:6px}
+.sw{width:14px;height:3px;border-radius:2px}
+svg{display:block;width:100%;height:auto}
+.svgbox{position:relative}
+.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--border);
+  border-radius:8px;padding:7px 10px;font-size:12px;box-shadow:0 3px 14px rgba(0,0,0,.13);
+  display:none;z-index:5;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--ink2)}
+.tip b{color:var(--ink);font-weight:600}
+.axis text{fill:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}
+.gline{stroke:var(--grid);stroke-width:1}
+.bline{stroke:var(--baseline);stroke-width:1}
+.dlabel{font-size:11.5px;font-weight:600}
+footer{margin-top:80px;padding-top:22px;border-top:1px solid var(--grid);
+  font-size:13px;color:var(--muted)}
+footer p{color:var(--muted);font-size:13px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Quantitative Research · TAIFEX TX</div>
+  <h1>台指期量化研究與驗證</h1>
+  <p class="sub">以期交所與證交所官方資料，對 24 組日線策略做含成本回測，並以樣本外
+  walk-forward、平穩 bootstrap、Deflated Sharpe 與對抗性程式碼審查驗證。研究期間
+  1998/07–2026/07，共 6,957 個交易日。</p>
+  <div class="badges">
+    <span class="badge">資料：TAIFEX / TWSE 官方</span>
+    <span class="badge">1998-07-21 → 2026-07-31</span>
+    <span class="badge">6,957 交易日 · 336 次換月</span>
+    <span class="badge">成本：稅 0.002%＋手續費＋滑價 1 點/邊</span>
+    <span class="badge">執行：次日開盤成交</span>
+  </div>
+
+  <div class="verdicts">
+    <div class="vcard">
+      <h3><span class="dot" style="background:var(--good)"></span>可辯護的發現</h3>
+      <p>RSI2 逢低買、基差逆勢、PCR 三個家族通過滾動選參的 walk-forward（OOS Sharpe
+      0.45–0.57）；只做多的均線濾網用一半回撤拿到與大盤相當的報酬。隔夜報酬結構與除息季基差為確定的市場結構事實。</p>
+    </div>
+    <div class="vcard">
+      <h3><span class="dot" style="background:var(--bad)"></span>不可行或已衰退</h3>
+      <p>多空趨勢突破（Donchian、長均線多空）walk-forward 後約等於零；日盤放空負期望；
+      隔夜持有毛利被每日雙邊成本吃光且正負號由滑價假設決定；外資部位方向訊號在僅有的三年樣本內失效。</p>
+    </div>
+    <div class="vcard">
+      <h3><span class="dot" style="background:var(--warn)"></span>統計警語</h3>
+      <p>本研究共嘗試 74 個變體。經 Deflated Sharpe 校正後，<strong>沒有任何策略能在
+      95% 信心下與資料探勘的運氣區分</strong>（最高 56%）。所有正面結果都應以此為前提解讀。</p>
+    </div>
+  </div>
+</header>
+
+<section id="s1">
+  <div class="secno">01</div>
+  <h2>資料與方法</h2>
+  <p><strong>資料來源全部為官方原始檔</strong>：期交所「期貨每日交易行情」（TX 88,667 列、MTX 95,763 列，1998 起）、
+  「三大法人依契約」（TXF/MXF，期交所查詢介面僅提供最近三年：2023/08–2026/07）、「臺指選擇權 Put/Call 比」（2001/12 起），
+  與證交所加權指數日 OHLC（1999 起）。指數資料以 Yahoo ^TWII 交叉驗證：中位差異 0.0000%。</p>
+  <ul>
+    <li class="dim"><strong>連續合約</strong>：近月合約於結算日（當月第三個週三）換至次月；日報酬一律以「同一合約」的收盤價計算，完全排除換月跳空污染。技術指標使用回溯調整價格（換月跳空移除、錨定最新收盤）。</li>
+    <li class="dim"><strong>執行慣例</strong>：收盤訊號於<strong>次日開盤</strong>成交——2017/5/15 夜盤上線前，13:45 收盤後當日已無任何交易時段，「收盤訊號收盤成交」是不可執行的（本報告把該樂觀慣例列為敏感度對照）。漲跌停鎖死日（全日單一價）禁止成交、順延。</li>
+    <li class="dim"><strong>成本</strong>：期交稅 0.002%/邊＋手續費 60 元/口/邊＋滑價 1 點/邊；持倉跨換月日另計平舊倉＋開新倉兩邊。以 2026 年指數水準約當來回 3.2 點。</li>
+    <li class="dim"><strong>無前視設計</strong>：三大法人與 PCR 於 15:00 後公布（日盤 13:45 收盤）——次日開盤執行天然滿足時序；每個策略的統計自「資料存在＋指標暖機完成」的日期起算。</li>
+  </ul>
+</section>
+
+<section id="s2">
+  <div class="secno">02</div>
+  <h2>合約規格與交易成本（2026-08 現況）</h2>
+  <div class="tblwrap"><table>
+    <thead><tr><th>項目</th><th>大台 TX</th><th>小台 MTX</th><th>微台 TMF</th></tr></thead>
+    <tbody>
+      <tr><td class="tname">每點價值</td><td class="num">NT$200</td><td class="num">NT$50</td><td class="num">NT$10</td></tr>
+      <tr><td class="tname">原始保證金（2026/07）</td><td class="num">636,000</td><td class="num">159,000</td><td class="num">31,800</td></tr>
+      <tr><td class="tname">單邊期交稅（指數 44,000）</td><td class="num">≈176 元</td><td class="num">≈44 元</td><td class="num">≈8.8 元</td></tr>
+      <tr><td class="tname">來回總成本（含滑價1點）</td><td class="num">≈3.2 點</td><td class="num">≈2.8 點</td><td class="num">2–4 點</td></tr>
+    </tbody>
+  </table></div>
+  <p class="dim">日盤 08:45–13:45、夜盤 15:00–次日 05:00；漲跌幅為前一日盤結算價 ±10%。
+  結算日為每月第三個週三（13:30 收盤），最後結算價＝結算日 13:00–13:30 現貨指數每 5 秒揭示值之算術平均。
+  個人交易國內期貨之所得目前依所得稅法第 4-2 條停徵所得稅（損失亦不得扣除），僅付期交稅。保證金隨指數機動調整，務必以期交所當期公告為準。</p>
+</section>
+
+<section id="s3">
+  <div class="secno">03</div>
+  <h2>市場結構：四個先於策略的事實</h2>
+
+  <h3>一、報酬集中在隔夜，日盤時段幾乎不賺錢</h3>
+  <p>加權指數 1999–2026 的隔夜時段（收盤→次日開盤）年化 <strong class="pos">+28.2%</strong>（t=10.9），
+  日盤時段（開盤→收盤）年化 <strong class="neg">−16.4%</strong>（t=−5.4）。台指期上（8:45 開盤）同樣分化但幅度較小：
+  隔夜平均 +4.3bp/日（t=3.8）、日內 +0.8bp（t=0.6）。這是結構性規律——但<strong>不是</strong>可直接交易的策略：
+  每天雙邊進出的成本（來回 ≈3 點）恰好吃光這個溢酬，正負號完全由滑價假設決定（見 08 節）。</p>
+  <div class="chart">
+    <h4>台指期時段報酬分解（同合約、未計成本）</h4>
+    <div class="csub">累積報酬（對數刻度）· 1998/07–2026/07 · 週線取樣</div>
+    <div class="legend" id="lg-session"></div>
+    <div class="svgbox" id="ch-session"></div>
+  </div>
+
+  <h3>二、月轉換效應存在但已弱化</h3>
+  <div class="tiles">
+    <div class="tile"><div class="k">月底1日＋月初3日平均日報酬</div><div class="v pos">+12.7bp</div><div class="s">t = 3.4（指數，1999–2026）</div></div>
+    <div class="tile"><div class="k">其餘交易日</div><div class="v">+1.6bp</div><div class="s">t = 0.9</div></div>
+    <div class="tile"><div class="k">期貨上實測（含成本）</div><div class="v">Sharpe 0.34</div><div class="s">bootstrap p = 0.063</div></div>
+  </div>
+  <p class="dim">注意：「月底最後一日」須依交易所行事曆事前認定，颱風臨時休市會讓事後認定產生輕微前視；
+  只用「月初 3 日」的無前視版本 Sharpe 降至 0.13——TOM 效應大半來自月底那一腿，證據強度打折。</p>
+
+  <h3>三、除息季的結構性逆價差</h3>
+  <p>加權指數是價格指數：成分股除息時點數直接蒸發。期貨提前反映契約期內的預期除息，
+  6–8 月因此出現月均 −29 至 −46 點的結構性逆價差（2026 年估累計 175–256 點）——
+  <strong>這不是看空訊號，也不是免費套利</strong>；但它讓未經股息調整的基差訊號在夏季系統性失真。</p>
+  <div class="chart">
+    <h4>期現貨基差的月度結構</h4>
+    <div class="csub">各月平均基差（期貨收盤 − 指數收盤，點）· 1999–2026</div>
+    <div class="svgbox" id="ch-basis"></div>
+  </div>
+
+  <h3>四、尾部風險大於保證金</h3>
+  <p>±10% 的單日極限跳空對大台一口約 <strong>90 萬元</strong>，超過現行原始保證金 63.6 萬——
+  停損單擋不住開盤跳空。真實案例：2025/4/7 開盤直接跳空 −2,129 點鎖死跌停（全日成交僅 2,736 口，任何賣單都出不掉）；
+  2026/6/6 夜盤暴跌 3,006 點；2024/8/5 現貨 −8.35%。<strong>口數上限必須以「±10% 跳空仍可承受」反推</strong>，
+  而不是用停損距離反推。</p>
+</section>
+
+<section id="s4">
+  <div class="secno">04</div>
+  <h2>24 組策略全樣本總表</h2>
+  <p class="dim">次日開盤成交、含全部成本；每列自該策略「資料存在＋暖機完成」日起算。
+  Sharpe 為算術日報酬年化（×√248）；年化報酬為幾何複利。三大法人類策略僅有 2023/08 起三年資料，統計檢定力有限。</p>
+  {{T_FULL}}
+</section>
+
+<section id="s5">
+  <div class="secno">05</div>
+  <h2>值得認真對待的三條線</h2>
+  <div class="chart">
+    <h4>權益曲線：基準 vs 三個長多型策略</h4>
+    <div class="csub">淨值（起始=1，對數刻度）· 含成本 · 週線取樣</div>
+    <div class="legend" id="lg-main"></div>
+    <div class="svgbox" id="ch-main"></div>
+  </div>
+
+  <h3>均線濾網（只做多）：一半的回撤，同等的報酬</h3>
+  <p>20/60 均線之上持有多單、之下空手：年化 9.2% vs 買進持有 9.9%，但最大回撤從
+  <strong class="neg">−67%</strong> 縮到 <strong>−30%</strong>。它的價值不是 α（對大盤 β=0.46，α 的 t 值僅 2.0）而是
+  <strong>避開了 2000、2008、2022 三次半山腰</strong>。多空版本遠差於只做多——台股的空方腿在制度性多頭偏移下長期虧損。</p>
+
+  <h3>RSI2 逢低買：唯一在六個子期間單調變強的策略</h3>
+  <p>200 日均線之上、RSI(2)&lt;10 時買進，RSI&gt;60 出場。曝險僅 12%、勝率 74.6%、回撤 −21%。
+  子期間 Sharpe 從 1999–2007 的 0.04 一路升到 2023–2026 的 1.4+；
+  <strong>它是 walk-forward 的最大倖存者（OOS Sharpe 0.57、回撤 −13%、t=2.7）</strong>。
+  2026 年 5–7 月的暴跌＋V 轉中做出 +20.8%（同期大盤 +9.5%）。經濟直覺：台股的「跌深買盤」行為在被動資金與散戶定期定額時代越來越強。</p>
+
+  <h3>防禦組合：三個低相關長多策略的等權</h3>
+  <div class="tiles">
+    <div class="tile"><div class="k">組合 2018–2026 Sharpe</div><div class="v">1.21</div><div class="s">全樣本 0.65</div></div>
+    <div class="tile"><div class="k">2018–2026 年化</div><div class="v pos">+11.2%</div><div class="s">最大回撤 −13.7%</div></div>
+    <div class="tile"><div class="k">兩兩相關係數</div><div class="v">0.15–0.42</div><div class="s">均線濾網／RSI2／TOM</div></div>
+    <div class="tile"><div class="k">2026 股災三個月</div><div class="v pos">+11.5%</div><div class="s">大盤同期 +9.5%、波動更低</div></div>
+  </div>
+  <p class="note">2018 後大盤本身年化 22%——長多型策略的樣本外亮眼有相當部分是搭了 β 的順風車。
+  α 檢定（對大盤迴歸後的殘差）中沒有任何策略的 t 值超過 2.5。</p>
+</section>
+
+<section id="s6">
+  <div class="secno">06</div>
+  <h2>時代切片：什麼在衰退、什麼在變強</h2>
+  <p class="dim">以 2018/01/01 切分（切分點先於本研究、非最佳化選擇）。注意：本表<strong>不是</strong>真正的樣本外——
+  策略參數為文獻慣用值而非前段資料選出；真正的樣本外驗證見第 07 節 walk-forward。</p>
+  {{T_SPLIT}}
+  <div class="chart">
+    <h4>1998–2017 vs 2018–2026 Sharpe 對照</h4>
+    <div class="csub">灰點＝前段，藍點＝後段；右移＝變強</div>
+    <div class="svgbox" id="ch-prepost"></div>
+  </div>
+  <p><strong>衰退的</strong>：基差逆勢的優勢集中在 1998–2007（市場尚無效率的年代），2018 後 α 轉負。
+  <strong>變強的</strong>：逢低買、趨勢濾網——與 2018 後「急跌急彈＋長多頭」的市場性格一致；
+  這既可能是行為改變（被動化、當沖稅減半後的流動性結構），也可能只是這八年恰好是多頭。無法區分，誠實以對。</p>
+  <div class="chart">
+    <h4>已衰退／未確立的策略線</h4>
+    <div class="csub">淨值（起始=1，對數刻度）· 含成本 · 週線取樣</div>
+    <div class="legend" id="lg-decay"></div>
+    <div class="svgbox" id="ch-decay"></div>
+  </div>
+</section>
+
+<section id="s7">
+  <div class="secno">07</div>
+  <h2>驗證火線：三層檢定</h2>
+
+  <h3>第一層：平穩 bootstrap（單一策略是否顯著）</h3>
+  <p class="dim">Politis–Romano 平穩 bootstrap（平均段長 20 日、2,000 次重抽、去均值後單尾檢定）。
+  各策略序列自其有效起算日開始。</p>
+  {{T_BOOT}}
+
+  <h3>第二層：walk-forward（參數誠實了還剩多少）</h3>
+  <p>每年用過去五年資料在參數網格中選出最佳組合，套用到下一年，滾動 22 個年度。
+  這是對「參數是否被後見之明挑出」最嚴格的回答：</p>
+  {{T_WF}}
+  <p><strong>RSI2 逢低買（0.57）、基差（0.48）、PCR（0.45）存活；趨勢突破類全數陣亡。</strong>
+  注意 walk-forward 的多空趨勢家族（ma_cross 0.25）遠低於固定參數只做多版本——
+  流傳的趨勢策略績效大多來自「事後選參＋只呈現做多」的組合。</p>
+
+  <h3>第三層：Deflated Sharpe（74 個變體的代價）</h3>
+  <p class="dim">嘗試越多變體，最好那個「本來就該」越好。以 Bailey–López de Prado 校正：
+  74 次試驗下，純運氣的期望最大 Sharpe 已達 0.67。</p>
+  {{T_DSR}}
+  <p><strong>結論：以 95% 標準，本研究無法宣稱找到任何「確定存在」的 α。</strong>
+  可辯護的主張只到這裡：三個家族在文獻先驗、經濟直覺、bootstrap 與 walk-forward 四個獨立角度上一致向好，
+  值得以小規模、嚴格風控續行驗證；其餘變體應視為已被否證。</p>
+</section>
+
+<section id="s8">
+  <div class="secno">08</div>
+  <h2>執行假設決定成敗</h2>
+  <h3>同收盤成交 vs 次日開盤成交</h3>
+  <p class="dim">「收盤算訊號、同一收盤成交」在 2017 年夜盤上線前物理上不可能，卻是多數回測文章的預設。兩種慣例的差距＝績效灌水幅度：</p>
+  {{T_EXEC}}
+  <h3>滑價敏感度</h3>
+  <p class="dim">基準假設 1 點/邊；「波動日 3 點」情境＝|日報酬|&gt;3% 時滑價 3 點（突破型策略常在這種日子進場）。</p>
+  {{T_COST}}
+  <p><strong>隔夜持有策略的正負號完全由滑價決定</strong>（0 點：+6.7%/年；2 點：−4.9%/年）——
+  任何宣稱「隔夜溢酬可交易」的說法都應先回答滑價假設。持倉型策略（均線濾網、RSI2）對滑價穩健。</p>
+</section>
+
+<section id="s9">
+  <div class="secno">09</div>
+  <h2>籌碼訊號：三年資料的誠實答案</h2>
+  <p>期交所查詢介面僅提供最近三年的三大法人分商品資料（2023/08–2026/07，728 個交易日）。在這個短窗內：</p>
+  <ul>
+    <li class="dim"><strong>外資淨部位方向（多空）年化 −30%</strong>：外資期貨空單大部分是現貨部位的避險（2026/07 淨空 8.25 萬口的同時指數創高後急跌又 V 轉），淨空單≠看空。與文獻「避險污染」的警告完全一致。</li>
+    <li class="dim"><strong>小台散戶反向指標</strong>：修正資料缺失製造的假零後僅 51 筆交易，統計上無法下結論。</li>
+    <li class="dim"><strong>PCR 未平倉比</strong>是籌碼類唯一有完整歷史（2001 起）的訊號：全樣本 Sharpe 0.37（p=0.028）、walk-forward 0.45 存活——但其部位與多頭高度重疊，α 檢定 t 僅 0.9。</li>
+  </ul>
+  <p class="note">要對籌碼面下嚴謹結論，需要完整的 2007 起歷史（期交所年度檔案或第三方資料庫）。此為本研究明確的未竟事項。</p>
+</section>
+
+<section id="s10">
+  <div class="secno">10</div>
+  <h2>部位控管：先算活下來，再算報酬</h2>
+  <ul>
+    <li><strong>極限跳空反推口數</strong>：可容忍單日虧損 ÷（指數 × 10% × 每點價值）。例：權益 300 萬、容忍單日 −15%，指數 44,000 → 45 萬/口 → 最多 1 口大台。保證金允許的口數（≈4.7 口）是破產配方。</li>
+    <li><strong>單筆風險 1–2%</strong>：進場價至停損價 × 點值 × 口數 ≤ 權益 2%；凱利公式在肥尾下取 1/4 至 1/2。</li>
+    <li><strong>留倉過夜=承受隔夜跳空</strong>：2026/6/6 夜盤單日 −3,006 點。夜盤流動性僅日盤三分之一，掛單簿薄，避免夜盤市價單。</li>
+    <li><strong>組合分散優於單策略加碼</strong>：三策略組合的回撤（−13.7%）低於任何成分單獨表現的原因是 0.15–0.42 的低相關。</li>
+  </ul>
+</section>
+
+<section id="s11">
+  <div class="secno">11</div>
+  <h2>對抗性審查：這份研究修掉了自己哪些錯</h2>
+  <p class="dim">三位獨立審查代理（前視偏誤／統計效度／執行現實性）對程式碼與資料做了逐行檢驗，找到並修正：</p>
+  <ol>
+    <li class="dim"><strong>換月跳空污染訊號</strong>：指標原以含換月跳空的價格計算（28 年累積 −104% 對數失真、除息季假跌破）。修正後趨勢類 Sharpe 平均上修 +0.15。</li>
+    <li class="dim"><strong>不可執行的成交慣例</strong>：同收盤成交在 2017 前不存在 → 改次日開盤，並將舊慣例列為敏感度。</li>
+    <li class="dim"><strong>漲跌停鎖死日的虛構成交</strong>：31 個單一價交易日、26 筆不可能的成交（含 2025/4/7 在鎖死跌停價「賣出」）→ 禁止並順延。</li>
+    <li class="dim"><strong>籌碼策略的全樣本稀釋</strong>：三年資料掛在 28 年框架上報告 → 一律自有效日起算。</li>
+    <li class="dim"><strong>NaN 求和製造假零</strong>：散戶比率在無資料年代被 sum() 造出 0 → min_count 修正。</li>
+    <li class="dim"><strong>幾何/算術 Sharpe 混用</strong>：DSR 公式僅對算術 Sharpe 合法 → 全面統一。</li>
+    <li class="dim"><strong>walk-forward 覆蓋不足</strong>：原僅測趨勢家族 → 擴充至基差/RSI2/PCR，並修正暖機不公平。</li>
+  </ol>
+  <p>引擎另通過 20 項單元測試（前視證明、成本邊數、換月同合約報酬、鎖死日遞延、隔夜跳空歸屬）。</p>
+</section>
+
+<section id="s12">
+  <div class="secno">12</div>
+  <h2>結論與後續路線</h2>
+  <p><strong>台指期日線頻率上，「必勝策略」不存在；可辯護的邊際優勢存在，且都是長多型的風控疊加。</strong></p>
+  <ol>
+    <li><strong>如果只帶走一件事</strong>：用結構事實（隔夜報酬分布、除息基差、尾部跳空）約束你的交易方式，比找訊號更有價值——空手時段選擇與口數控制的期望值改善，大於任何訊號的 α。</li>
+    <li><strong>值得續行驗證的</strong>（小規模＋嚴格風控＋預先註冊參數）：RSI2 逢低買、均線濾網（只做多）、股息調整後的基差訊號。三者組合優於單用。</li>
+    <li><strong>應該放棄的</strong>：日線多空趨勢突破、隔夜/日內時段策略、外資部位方向訊號。</li>
+    <li><strong>未竟事項</strong>：日內策略（ORB 等）需 tick/分 K 資料才能誠實驗證；三大法人 2007–2023 完整歷史；以除息點數表做股息調整基差；夜盤資料納入。</li>
+  </ol>
+</section>
+
+<footer>
+  <p>資料截至 2026-07-31 · 期交所/證交所官方來源 · 程式碼、原始資料與全部結果表：
+  repo <code>stanleytai0310-maker/lingguang</code> 分支 <code>claude/quantitative-trading-research-h9wlnb</code> 之 <code>quant-research/</code>。</p>
+  <p style="margin-top:8px">本報告為量化研究與歷史回測，非投資建議。期貨具高槓桿，可能損失超過本金。
+  歷史績效不代表未來表現；所有回測皆有其假設，實際交易結果將因執行、流動性與市場變化而異。</p>
+</footer>
+</div>
+
+<script type="application/json" id="data">{{PAYLOAD}}</script>
+<script>
+(function(){
+"use strict";
+const D = JSON.parse(document.getElementById('data').textContent);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmtN = (v,d=2) => v==null?'—':Number(v).toFixed(d);
+
+function seriesColors(){ return [css('--s1'),css('--s2'),css('--s3'),css('--s4')]; }
+
+function legend(el, defs){
+  const box = document.getElementById(el); if(!box) return;
+  box.innerHTML = defs.map((d,i)=>`<span class="li"><span class="sw" style="background:${seriesColors()[i]}"></span>${d.label}</span>`).join('');
+}
+
+function lineChart(elId, data, defs, opts){
+  opts = opts||{};
+  const box = document.getElementById(elId); if(!box) return;
+  const W=860,H=340,L=46,Rm=110,T=14,B=26;
+  const dates = data.dates;
+  const n = dates.length;
+  const log = !!opts.log;
+  let lo=Infinity,hi=-Infinity;
+  defs.forEach(d=>data[d.key].forEach(v=>{if(v!=null){lo=Math.min(lo,v);hi=Math.max(hi,v);}}));
+  if(log){lo=Math.log(lo);hi=Math.log(hi);}
+  const pad=(hi-lo)*0.05; lo-=pad; hi+=pad;
+  const X=i=>L+(W-L-Rm)*i/(n-1);
+  const Y=v=>{const t=log?Math.log(v):v;return T+(H-T-B)*(1-(t-lo)/(hi-lo));};
+  let svg=`<svg viewBox="0 0 ${W} ${H}" role="img">`;
+  const ticks=5;
+  for(let k=0;k<=ticks;k++){
+    const t=lo+(hi-lo)*k/ticks; const v=log?Math.exp(t):t;
+    const y=T+(H-T-B)*(1-k/ticks);
+    svg+=`<line class="gline" x1="${L}" x2="${W-Rm}" y1="${y}" y2="${y}"/>`;
+    svg+=`<g class="axis"><text x="${L-6}" y="${y+4}" text-anchor="end">${v>=100?v.toFixed(0):v.toFixed(v<3?1:0)}</text></g>`;
+  }
+  const years=[];
+  for(let i=0;i<n;i++){const y=dates[i].slice(0,4);if(!years.length||years[years.length-1][0]!==y)years.push([y,i]);}
+  years.filter((_,j)=>j%4===0).forEach(([y,i])=>{
+    svg+=`<g class="axis"><text x="${X(i)}" y="${H-8}" text-anchor="middle">${y}</text></g>`;
+  });
+  const cols=seriesColors();
+  defs.forEach((d,di)=>{
+    let path='';
+    data[d.key].forEach((v,i)=>{if(v==null)return;path+=(path?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1);});
+    svg+=`<path d="${path}" fill="none" stroke="${cols[di]}" stroke-width="2" stroke-linejoin="round"/>`;
+    const lastIdx=data[d.key].length-1;
+    let li=lastIdx; while(li>0&&data[d.key][li]==null)li--;
+    svg+=`<text class="dlabel" x="${W-Rm+6}" y="${Y(data[d.key][li])+4}" fill="${cols[di]}">${d.short}</text>`;
+  });
+  svg+=`<line class="bline" x1="${L}" x2="${W-Rm}" y1="${H-B}" y2="${H-B}"/>`;
+  svg+=`<line id="${elId}-cross" x1="0" x2="0" y1="${T}" y2="${H-B}" stroke="${css('--baseline')}" stroke-width="1" style="display:none"/>`;
+  svg+='</svg>';
+  box.innerHTML=svg+`<div class="tip" id="${elId}-tip"></div>`;
+  const svgEl=box.querySelector('svg'), tip=document.getElementById(elId+'-tip'),
+        cross=document.getElementById(elId+'-cross');
+  svgEl.addEventListener('mousemove',e=>{
+    const r=svgEl.getBoundingClientRect();
+    const x=(e.clientX-r.left)*W/r.width;
+    let i=Math.round((x-L)/(W-L-Rm)*(n-1)); i=Math.max(0,Math.min(n-1,i));
+    cross.style.display='block'; cross.setAttribute('x1',X(i)); cross.setAttribute('x2',X(i));
+    tip.style.display='block';
+    const rows=defs.map((d,di)=>{const v=data[d.key][i];
+      return `<span style="color:${seriesColors()[di]}">●</span> ${d.short}　<b>${fmtN(v,2)}</b>`;}).join('<br>');
+    tip.innerHTML=`<b>${dates[i]}</b><br>${rows}`;
+    const bx=box.getBoundingClientRect();
+    let px=(e.clientX-bx.left)+14, py=(e.clientY-bx.top)-10;
+    if(px+170>bx.width)px-=190;
+    tip.style.left=px+'px'; tip.style.top=py+'px';
+  });
+  svgEl.addEventListener('mouseleave',()=>{tip.style.display='none';cross.style.display='none';});
+}
+
+function barChart(elId, byMonth){
+  const box=document.getElementById(elId); if(!box) return;
+  const W=860,H=280,L=46,Rm=16,T=14,B=30;
+  const vals=[]; for(let m=1;m<=12;m++)vals.push(byMonth[m]??byMonth[String(m)]??0);
+  const lo=Math.min(0,...vals)*1.15, hi=Math.max(0,...vals)*1.3+2;
+  const Y=v=>T+(H-T-B)*(1-(v-lo)/(hi-lo));
+  const bw=(W-L-Rm)/12*0.62;
+  let svg=`<svg viewBox="0 0 ${W} ${H}" role="img">`;
+  for(let k=0;k<=4;k++){const v=lo+(hi-lo)*k/4,y=Y(v);
+    svg+=`<line class="gline" x1="${L}" x2="${W-Rm}" y1="${y}" y2="${y}"/>`;
+    svg+=`<g class="axis"><text x="${L-6}" y="${y+4}" text-anchor="end">${v.toFixed(0)}</text></g>`;}
+  const c=css('--s1');
+  vals.forEach((v,i)=>{
+    const x=L+(W-L-Rm)*(i+0.5)/12-bw/2;
+    const y0=Y(0),y1=Y(v);
+    const top=Math.min(y0,y1),h=Math.max(Math.abs(y0-y1),1);
+    svg+=`<rect x="${x.toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${c}"><title>${i+1}月：${v.toFixed(1)} 點</title></rect>`;
+    if(v<-20)svg+=`<text class="dlabel" x="${(x+bw/2).toFixed(1)}" y="${(y1+14).toFixed(1)}" text-anchor="middle" fill="${c}">${v.toFixed(0)}</text>`;
+    svg+=`<g class="axis"><text x="${(x+bw/2).toFixed(1)}" y="${H-8}" text-anchor="middle">${i+1}月</text></g>`;
+  });
+  svg+=`<line class="bline" x1="${L}" x2="${W-Rm}" y1="${Y(0)}" y2="${Y(0)}"/>`;
+  svg+='</svg>';
+  box.innerHTML=svg;
+}
+
+function dumbbell(elId, mapping, nameZh){
+  const box=document.getElementById(elId); if(!box) return;
+  const entries=Object.entries(mapping).sort((a,b)=>b[1].post-a[1].post);
+  const W=860,rowH=34,L=250,Rm=40,T=16,B=30,H=T+B+entries.length*rowH;
+  let lo=0,hi=0;
+  entries.forEach(([_,v])=>{lo=Math.min(lo,v.pre,v.post);hi=Math.max(hi,v.pre,v.post);});
+  lo-=0.1;hi+=0.15;
+  const X=v=>L+(W-L-Rm)*(v-lo)/(hi-lo);
+  let svg=`<svg viewBox="0 0 ${W} ${H}" role="img">`;
+  for(let k=0;k<=5;k++){const v=lo+(hi-lo)*k/5,x=X(v);
+    svg+=`<line class="gline" x1="${x}" x2="${x}" y1="${T}" y2="${H-B}"/>`;
+    svg+=`<g class="axis"><text x="${x}" y="${H-10}" text-anchor="middle">${v.toFixed(1)}</text></g>`;}
+  if(lo<0&&hi>0)svg+=`<line class="bline" x1="${X(0)}" x2="${X(0)}" y1="${T}" y2="${H-B}"/>`;
+  entries.forEach(([name,v],i)=>{
+    const y=T+rowH*(i+0.5);
+    const label=(nameZh[name]||name).replace(/（.*/,'');
+    svg+=`<g class="axis"><text x="${L-10}" y="${y+4}" text-anchor="end" style="font-size:12.5px">${label}</text></g>`;
+    svg+=`<line x1="${X(v.pre)}" x2="${X(v.post)}" y1="${y}" y2="${y}" stroke="${css('--baseline')}" stroke-width="2"/>`;
+    svg+=`<circle cx="${X(v.pre)}" cy="${y}" r="5" fill="${css('--muted')}"><title>${label} 1998–2017：${v.pre}</title></circle>`;
+    svg+=`<circle cx="${X(v.post)}" cy="${y}" r="6" fill="${css('--s1')}"><title>${label} 2018–2026：${v.post}</title></circle>`;
+  });
+  svg+='</svg>';
+  box.innerHTML=svg;
+}
+
+const NAME_ZH = {
+  'buy_hold':'買進持有','ma_20_60_lo':'均線濾網 20/60 多','ma_50_200_lo':'均線濾網 50/200 多',
+  'rsi2_lo':'RSI2 逢低買','tom_1_3':'月轉換','pcr_oi_ls':'PCR 未平倉比','basis_z120_ls':'基差 z120',
+  'donchian_55_20_ls':'Donchian 55/20','tsmom_60_ls':'時序動能 60','combo_3':'防禦組合'
+};
+
+function draw(){
+  const c=D.chart;
+  legend('lg-main',[{label:'買進持有'},{label:'均線濾網 20/60（只做多）'},{label:'RSI2 逢低買'},{label:'防禦組合（等權）'}]);
+  lineChart('ch-main',c.equity_main,[
+    {key:'buy_hold',short:'買進持有'},{key:'ma_20_60_lo',short:'均線濾網'},
+    {key:'rsi2_lo',short:'RSI2'},{key:'combo_3',short:'組合'}],{log:true});
+  legend('lg-decay',[{label:'基差 z120（多空）'},{label:'Donchian 55/20（多空）'},{label:'PCR 未平倉比（多空）'}]);
+  lineChart('ch-decay',c.equity_decay,[
+    {key:'basis_z120_ls',short:'基差'},{key:'donchian_55_20_ls',short:'Donchian'},
+    {key:'pcr_oi_ls',short:'PCR'}],{log:true});
+  legend('lg-session',[{label:'隔夜（收盤→次日開盤）'},{label:'日內（開盤→收盤）'}]);
+  lineChart('ch-session',c.session_cum,[
+    {key:'overnight',short:'隔夜'},{key:'intraday',short:'日內'}],{log:true});
+  barChart('ch-basis',c.basis_by_month);
+  dumbbell('ch-prepost',c.prepost_sharpe,NAME_ZH);
+}
+draw();
+new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+if(window.matchMedia)window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',draw);
+})();
+</script>
