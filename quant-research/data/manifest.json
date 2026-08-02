@@ -1,21 +1,21 @@
 {
-  "generated_utc": "2026-08-02T11:47:42.968857",
+  "generated_utc": "2026-08-02T12:21:02.913882",
   "files": {
     "futures_daily_MTX.csv": {
-      "rows": 95494,
-      "sha256_16": "43617775e4f2e1d4"
+      "rows": 95763,
+      "sha256_16": "3c6579c52dff8e4f"
     },
     "futures_daily_TX.csv": {
-      "rows": 88488,
-      "sha256_16": "cbbe15b9a1832dca"
+      "rows": 88667,
+      "sha256_16": "b3ef94a4bcebe0e3"
     },
     "institutional_MXF.csv": {
-      "rows": 0,
-      "sha256_16": "01ba4719c80b6fe9"
+      "rows": 2184,
+      "sha256_16": "5b5bf5024ecb7249"
     },
     "institutional_TXF.csv": {
-      "rows": 15,
-      "sha256_16": "8d39e54b65a3cbfe"
+      "rows": 2184,
+      "sha256_16": "f4e7c363e50bffdd"
     },
     "taiex_daily_raw.csv": {
       "rows": 6832,
@@ -26,8 +26,8 @@
       "sha256_16": "6ab25b02241c693e"
     },
     "txo_pc_ratio.csv": {
-      "rows": 6049,
-      "sha256_16": "28ecd9b1b260b76d"
+      "rows": 6036,
+      "sha256_16": "1124a009132bac10"
     }
   }
 }
