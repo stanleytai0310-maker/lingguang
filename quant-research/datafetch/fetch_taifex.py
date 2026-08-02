@@ -38,7 +38,8 @@ def month_starts(start: dt.date, end: dt.date):
         cur = nxt
 
 
-def post_csv(url: str, data: dict, tag: str, tries: int = 4) -> str | None:
+def post_csv(url: str, data: dict, tag: str, tries: int = 4,
+             backoff_base: float = 2.0) -> str | None:
     for i in range(tries):
         try:
             r = requests.post(url, data=data, headers=UA, timeout=60)
@@ -49,12 +50,17 @@ def post_csv(url: str, data: dict, tag: str, tries: int = 4) -> str | None:
                     except UnicodeDecodeError:
                         continue
                 return r.content.decode("utf-8", errors="replace")
+            if r.status_code == 429:
+                raise RuntimeError(f"http=429 len={len(r.content)}")
             raise RuntimeError(f"http={r.status_code} len={len(r.content)}")
         except Exception as e:  # noqa: BLE001
             if i == tries - 1:
                 FAILURES.append({"tag": tag, "data": data, "error": str(e)})
                 return None
-            time.sleep(2**i + random.random())
+            wait = backoff_base ** (i + 1) + random.random() * 2
+            if "429" in str(e):
+                wait = max(wait, 15.0 + 10 * i)
+            time.sleep(wait)
     return None
 
 
@@ -68,7 +74,8 @@ def parse_csv_text(txt: str) -> pd.DataFrame | None:
         return None
 
 
-def fetch_monthly(url, base_data, date_keys, start, end, tag, workers=3):
+def fetch_monthly(url, base_data, date_keys, start, end, tag, workers=3,
+                  pause=0.2, tries=4, backoff_base=2.0):
     chunks = list(month_starts(start, end))
 
     def one(c):
@@ -76,8 +83,8 @@ def fetch_monthly(url, base_data, date_keys, start, end, tag, workers=3):
         d = dict(base_data)
         d[date_keys[0]] = s.strftime("%Y/%m/%d")
         d[date_keys[1]] = e.strftime("%Y/%m/%d")
-        time.sleep(0.2 + random.random() * 0.3)
-        txt = post_csv(url, d, f"{tag}:{s}")
+        time.sleep(pause + random.random() * pause)
+        txt = post_csv(url, d, f"{tag}:{s}", tries=tries, backoff_base=backoff_base)
         return parse_csv_text(txt) if txt else None
 
     out = []
@@ -105,15 +112,18 @@ def fetch_futures_daily(out_dir: Path, today: dt.date):
 
 
 def fetch_institutional(out_dir: Path, today: dt.date):
+    # futContractsDateDown rate-limits aggressively (429): single worker,
+    # long pauses, and patient 429 backoff.
     for commodity in ["TXF", "MXF"]:
         df = fetch_monthly(
             f"{TAIFEX}/futContractsDateDown",
             {"commodityId": commodity},
             ("queryStartDate", "queryEndDate"),
             dt.date(2007, 7, 2), today, f"inst_{commodity}",
+            workers=1, pause=2.0, tries=6, backoff_base=3.0,
         )
         df.to_csv(out_dir / f"institutional_{commodity}.csv", index=False)
-        print(f"[institutional {commodity}] rows={len(df)}")
+        print(f"[institutional {commodity}] rows={len(df)}", flush=True)
 
 
 def fetch_pc_ratio(out_dir: Path, today: dt.date):
@@ -164,16 +174,27 @@ def fetch_yahoo(out_dir: Path):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="quant-research/data")
+    ap.add_argument("--only", default="",
+                    help="comma list: taiex,futures,institutional,pcr,yahoo (default all)")
     args = ap.parse_args()
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
     today = dt.date.today()
+    only = set(args.only.split(",")) if args.only else set()
 
-    fetch_taiex(out_dir, today)
-    fetch_futures_daily(out_dir, today)
-    fetch_institutional(out_dir, today)
-    fetch_pc_ratio(out_dir, today)
-    fetch_yahoo(out_dir)
+    def want(name):
+        return not only or name in only
+
+    if want("taiex"):
+        fetch_taiex(out_dir, today)
+    if want("futures"):
+        fetch_futures_daily(out_dir, today)
+    if want("institutional"):
+        fetch_institutional(out_dir, today)
+    if want("pcr"):
+        fetch_pc_ratio(out_dir, today)
+    if want("yahoo"):
+        fetch_yahoo(out_dir)
 
     manifest = {"generated_utc": dt.datetime.utcnow().isoformat(), "files": {}}
     for f in sorted(out_dir.glob("*.csv")):

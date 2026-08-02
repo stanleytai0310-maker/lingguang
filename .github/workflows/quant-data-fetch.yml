@@ -32,7 +32,7 @@ jobs:
         run: pip install -r quant-research/datafetch/requirements.txt
 
       - name: Fetch TAIFEX / TWSE historical data
-        run: python quant-research/datafetch/fetch_taifex.py --out quant-research/data
+        run: python quant-research/datafetch/fetch_taifex.py --out quant-research/data --only institutional
 
       - name: Commit data back to branch
         run: |
