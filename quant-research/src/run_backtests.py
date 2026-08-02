@@ -38,10 +38,32 @@ def main():
     full, isoos, subs, costs = [], [], [], []
     curves = {"date": df["date"]}
 
-    for name, (fn, kw) in st.REGISTRY.items():
+    # session-hold variants use their own runner (two cost sides per day)
+    session_specs = {
+        "overnight_long": {"which": "overnight", "direction": 1},
+        "intraday_short": {"which": "intraday", "direction": -1},
+    }
+
+    def runner(name, slippage_pts=1.0):
+        if name in session_specs:
+            return bt.run_session(df, slippage_pts=slippage_pts, **session_specs[name])
+        fn, kw = st.REGISTRY[name]
         sig, extra_lag = fn(df, **kw)
-        res = bt.run(df, sig, extra_lag=extra_lag)
-        full.append(bt.stats(res, name))
+        return bt.run(df, sig, extra_lag=extra_lag, slippage_pts=slippage_pts)
+
+    def fix_session_stats(name, res, s):
+        if name in session_specs:
+            active = res[res["pos"] != 0]
+            s["n_trades"] = int(len(active))
+            s["win_rate_pct"] = round(float((active["net"] > 0).mean() * 100), 1)
+            s["avg_trade_pct"] = round(float(active["net"].mean() * 100), 4)
+            s["trades_per_yr"] = round(len(active) / (len(res) / bt.TRADING_DAYS), 1)
+        return s
+
+    all_names = list(st.REGISTRY) + list(session_specs)
+    for name in all_names:
+        res = runner(name)
+        full.append(fix_session_stats(name, res, bt.stats(res, name)))
         curves[name] = res["equity"].values
 
         m_is = res[res["date"] < OOS_START].copy()
@@ -50,15 +72,15 @@ def main():
             if len(chunk) > 60:
                 chunk = chunk.copy()
                 chunk["equity"] = (1 + chunk["net"]).cumprod()
-                s = bt.stats(chunk, name)
+                s = fix_session_stats(name, chunk, bt.stats(chunk, name))
                 s["window"] = tag
                 isoos.append(s)
 
         subs.extend(bt.subperiod_stats(res, name, SUBPERIOD_SPLITS))
 
         for slip in [0.0, 1.0, 2.0]:
-            r2 = bt.run(df, sig, extra_lag=extra_lag, slippage_pts=slip)
-            s2 = bt.stats(r2, name)
+            r2 = runner(name, slippage_pts=slip)
+            s2 = fix_session_stats(name, r2, bt.stats(r2, name))
             s2["slippage_pts"] = slip
             costs.append(s2)
 

@@ -1,0 +1,73 @@
+{
+  "weekday": {
+    "Mon": {
+      "mean_bp": -3.97,
+      "t": -0.98,
+      "n": 1335
+    },
+    "Tue": {
+      "mean_bp": 4.01,
+      "t": 1.16,
+      "n": 1367
+    },
+    "Wed": {
+      "mean_bp": 10.94,
+      "t": 3.21,
+      "n": 1370
+    },
+    "Thu": {
+      "mean_bp": 1.57,
+      "t": 0.43,
+      "n": 1355
+    },
+    "Fri": {
+      "mean_bp": 5.64,
+      "t": 1.59,
+      "n": 1330
+    },
+    "Sat": {
+      "mean_bp": 10.14,
+      "t": 0.54,
+      "n": 74
+    }
+  },
+  "turn_of_month": {
+    "tom_mean_bp": 12.69,
+    "tom_t": 3.38,
+    "rest_mean_bp": 1.59,
+    "rest_t": 0.89,
+    "n_tom": 1324,
+    "n_rest": 5507
+  },
+  "monthly_mean_bp": {
+    "1": 11.89,
+    "2": 10.99,
+    "3": 4.17,
+    "4": 6.02,
+    "5": 5.71,
+    "6": 1.21,
+    "7": -2.04,
+    "8": -0.2,
+    "9": -11.94,
+    "10": 1.76,
+    "11": 5.5,
+    "12": 13.68
+  },
+  "overnight": {
+    "mean_bp": 10.67,
+    "ann_pct": 28.15,
+    "t": 10.9
+  },
+  "intraday": {
+    "mean_bp": -6.89,
+    "ann_pct": -16.4,
+    "t": -5.35
+  },
+  "overnight_intraday_corr": -0.0091,
+  "gap_stats": {
+    "n_gap_up_1pct": 516,
+    "intraday_after_gapup_bp": -6.6,
+    "n_gap_dn_1pct": 405,
+    "intraday_after_gapdn_bp": 9.4
+  }
+}

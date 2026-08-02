@@ -47,6 +47,33 @@ def run(df: pd.DataFrame, sig: pd.Series, extra_lag: int = 0,
     return out
 
 
+def run_session(df: pd.DataFrame, which: str = "overnight", direction: int = 1,
+                sig: pd.Series | None = None, extra_lag: int = 0,
+                slippage_pts: float = 1.0, commission_ntd: float = 60.0,
+                tax_rate: float = 2e-5, point_value: float = 200.0) -> pd.DataFrame:
+    """Session-hold backtest: enter and exit within each day.
+
+    which='overnight': long prev close → today open (uses tx_ret_overnight).
+    which='intraday' : long today open → today close (uses tx_ret_intraday).
+    Every active day pays TWO sides of costs. `sig` (0/1 filter, default all
+    days) is lagged like the main engine to avoid lookahead.
+    """
+    col = f"tx_ret_{which}"
+    out = pd.DataFrame(index=df.index)
+    out["date"] = df["date"].values
+    if sig is None:
+        sig = pd.Series(1.0, index=df.index)
+    active = sig.reindex(df.index).fillna(0).clip(0, 1).shift(1 + extra_lag).fillna(0)
+    out["pos"] = active * direction
+    out["gross"] = out["pos"] * df[col].fillna(0)
+    cps = cost_per_side_frac(df["tx_close"], slippage_pts, commission_ntd,
+                             tax_rate, point_value)
+    out["cost"] = active * 2 * cps
+    out["net"] = out["gross"] - out["cost"]
+    out["equity"] = (1 + out["net"]).cumprod()
+    return out
+
+
 def _max_drawdown(equity: pd.Series) -> float:
     peak = equity.cummax()
     return float((equity / peak - 1).min())

@@ -77,15 +77,15 @@ def stationary_bootstrap(x: np.ndarray, n_boot=2000, mean_block=20):
     return real_sharpe, pval
 
 
-def bootstrap_all(df):
+def bootstrap_all(df=None):
+    """Bootstrap every strategy's daily net returns (recovered from the saved
+    equity curves, so session-hold variants are covered too)."""
+    eq = pd.read_csv(RESULTS / "equity_curves.csv", parse_dates=["date"])
     rows = []
-    for name, (fn, kw) in st.REGISTRY.items():
-        sig, lag = fn(df, **kw)
-        res = bt.run(df, sig, extra_lag=lag)
-        active = res[res["pos"] != 0]
-        if len(active) < 250:
+    for name in [c for c in eq.columns if c != "date"]:
+        x = eq[name].pct_change().dropna().values
+        if (x != 0).sum() < 250:
             continue
-        x = res["net"].values
         sh, pv = stationary_bootstrap(x)
         rows.append({"name": name, "sharpe": round(sh, 3), "p_value": round(pv, 4),
                      "n_days": len(x)})

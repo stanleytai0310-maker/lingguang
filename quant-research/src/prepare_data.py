@@ -28,7 +28,7 @@ def _norm_cols(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def _num(s):
-    if s.dtype != object:
+    if pd.api.types.is_numeric_dtype(s):
         return pd.to_numeric(s, errors="coerce")
     t = s.astype(str).str.strip().str.replace(",", "")
     return pd.to_numeric(t, errors="coerce")  # lone "-" (missing) coerces to NaN
@@ -97,6 +97,9 @@ def build_continuous(fut: pd.DataFrame) -> pd.DataFrame:
         prev_close_same.append(series.loc[prev_dates[-1]] if len(prev_dates) else np.nan)
     front["prev_close_same_contract"] = prev_close_same
     front["ret"] = front["close"] / front["prev_close_same_contract"] - 1
+    # session decomposition (same contract): overnight = prev close → today open
+    front["ret_overnight"] = front["open"] / front["prev_close_same_contract"] - 1
+    front["ret_intraday"] = front["close"] / front["open"] - 1
     # log-style back-adjusted level for charts
     front["adj_level"] = front["close"].iloc[-1] * np.exp(
         -(np.log1p(front["ret"].fillna(0))[::-1].cumsum()[::-1] - np.log1p(front["ret"].fillna(0)))
