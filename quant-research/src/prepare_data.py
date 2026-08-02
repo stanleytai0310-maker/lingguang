@@ -194,6 +194,12 @@ def main():
                           on="date", how="left")
     if len(inst):
         merged = merged.merge(inst, on="date", how="left")
+    # MTX total market OI (per-date sum over contracts) for the retail ratio
+    mtx_path = DATA / "futures_daily_MTX.csv"
+    if mtx_path.exists():
+        mtx = load_futures("MTX")
+        mtx_oi = mtx.groupby("date")["oi"].sum().rename("mtx_total_oi").reset_index()
+        merged = merged.merge(mtx_oi, on="date", how="left")
     if len(pcr):
         merged = merged.merge(pcr, on="date", how="left")
     merged["basis"] = merged["tx_close"] - merged["ix_close"]

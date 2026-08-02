@@ -171,15 +171,39 @@ def pcr_signal(df, hi=1.1, lo=0.9, short=True):
     return sig, 1
 
 
+# ── retail positioning (MTX) — contrarian at extremes ───────────────────
+
+def mtx_retail(df, z_win=120, th=1.5, short=True):
+    """散戶淨部位 = -(三大法人 MXF 淨額) / 小台全市場 OI，極端值反向操作。
+    Data published after the close → extra_lag=1."""
+    inst_cols = [c for c in df.columns if c.startswith("MXF_")]
+    if not inst_cols or "mtx_total_oi" not in df.columns:
+        return pd.Series(0.0, index=df.index), 1
+    inst_net = df[inst_cols].sum(axis=1)
+    ratio = -inst_net / df["mtx_total_oi"]
+    z = (ratio - ratio.rolling(z_win).mean()) / ratio.rolling(z_win).std()
+    # retail extremely short → long; extremely long → short
+    sig = pd.Series(np.where(z < -th, 1.0, np.where(z > th, -1.0 if short else 0.0, 0.0)),
+                    index=df.index)
+    sig[z.isna()] = 0.0
+    return sig, 1
+
+
 # ── basis ────────────────────────────────────────────────────────────────
 
-def basis_zscore(df, z_win=120, th=1.0, short=True):
+def basis_zscore(df, z_win=120, th=1.0, short=True, skip_div_season=False):
+    """Basis = futures − index. TAIEX is a price index, so May–Aug the basis
+    is structurally negative (expected dividend points priced in). With
+    skip_div_season=True no NEW positions are opened during May–Aug."""
     b = df["basis"].astype(float)
     z = (b - b.rolling(z_win).mean()) / b.rolling(z_win).std()
     # deep discount vs its own recent norm → contrarian long
     sig = pd.Series(np.where(z < -th, 1.0, np.where(z > th, -1.0 if short else 0.0, 0.0)),
                     index=df.index)
     sig[z.isna()] = 0.0
+    if skip_div_season:
+        months = pd.DatetimeIndex(df["date"]).month
+        sig[np.isin(months, [5, 6, 7, 8])] = 0.0
     return sig, 0
 
 
@@ -204,4 +228,7 @@ REGISTRY = {
     "foreign_level_lo": (foreign_oi_level, {"short": False}),
     "pcr_oi_ls": (pcr_signal, {"short": True}),
     "basis_z120_ls": (basis_zscore, {"z_win": 120, "th": 1.0, "short": True}),
+    "basis_z120_nodiv_ls": (basis_zscore, {"z_win": 120, "th": 1.0, "short": True,
+                                           "skip_div_season": True}),
+    "mtx_retail_z120_ls": (mtx_retail, {"z_win": 120, "th": 1.5, "short": True}),
 }

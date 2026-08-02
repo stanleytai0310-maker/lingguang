@@ -1,0 +1,670 @@
+{
+  "specs": {
+    "findings": [
+      {
+        "topic": "契約乘數與最小升降單位",
+        "claim": "大台 TX 每點 NT$200、小台 MTX 每點 NT$50、微台 TMF 每點 NT$10；三者最小升降單位皆為指數 1 點（即每跳一檔分別為 200/50/10 元）。TMF 於 2024-07-29 上市，規模為大台 1/20、小台 1/5，到期月份同大台（連續 3 個近月＋3 個季月），但無雙週到期契約。",
+        "confidence": "high",
+        "evidence": "多個來源一致：期交所英文商品頁確認 TX multiplier NT$200/point；群益期貨、量化通、統一期貨等商品規格頁確認三商品乘數與 1 點跳動單位；Yahoo 新聞與期交所新聞稿確認微台 2024/7/29 上市、每點 10 元、日夜盤皆可交易。",
+        "source_urls": [
+          "https://www.taifex.com.tw/enl/eng2/tX",
+          "https://www.capitalfutures.com.tw/zh-tw/productinformation/commodityinfo?cid=taiexfutures",
+          "https://quantpass.org/tmf/",
+          "https://tw.stock.yahoo.com/news/%E5%BE%AE%E5%9E%8B%E8%87%BA%E6%8C%87%E6%9C%9F-%E6%AF%8F%E9%BB%9E10%E5%85%83-%E6%97%A5%E5%A4%9C%E7%9B%A4%E7%9A%86%E5%8F%AF%E4%BA%A4%E6%98%93-201000816.html",
+          "https://www.pfcf.com.tw/product/detail/4844"
+        ]
+      },
+      {
+        "topic": "交易時段",
+        "claim": "日盤（一般交易時段）08:45–13:45；夜盤（盤後交易時段）15:00–次日 05:00，合計一天約 19 小時。日盤與夜盤是同一商品、同一部位可互相平倉。到期（結算）當日的到期月份契約只交易到 13:30，且該契約當天沒有盤後時段。",
+        "confidence": "high",
+        "evidence": "元大期貨、Money101、期交所盤後交易制度 Q&A（114.6.23 版 PDF）與多家期貨商教學頁一致；期交所盤後交易介紹頁確認國內股價指數類盤後時間 15:00–次日 05:00。",
+        "source_urls": [
+          "https://www.yuantafutures.com.tw/investment_school_01",
+          "https://www.taifex.com.tw/file/taifex/CHINESE/4/AHTradeQA_ch.pdf",
+          "https://www.taifex.com.tw/cht/4/aHIntroduction",
+          "https://www.money101.com.tw/blog/%E5%8F%B0%E6%8C%87%E6%9C%9F%E5%A4%9C%E7%9B%A4"
+        ]
+      },
+      {
+        "topic": "漲跌幅限制",
+        "claim": "國內股價指數期貨（含 TX/MTX/TMF）各交易時段漲跌幅為「前一個一般交易時段每日結算價」上下 10%：夜盤以當日日盤收盤後公布之每日結算價 ±10%，次日日盤沿用同一基準，故夜盤與次日日盤的漲跌停區間相同。註：現貨與期貨漲跌幅由 7% 放寬為 10% 是 2015 年 6 月的舊制變革（此時點來自模型知識，建議向期交所沿革頁複核）；另期交所日盤另有動態價格穩定措施（逐筆委託 ±2% 退單），屬微結構層級限制。",
+        "confidence": "high",
+        "evidence": "期交所盤後交易制度問答 Q&A PDF 明確記載「各交易時段最大漲跌幅為前一個一般交易時段每日結算價上下 10%」；10% 主體規則多來源一致。7%→10% 的 2015 年變更時點與動態價格穩定措施細節未在本次搜尋直接驗證，標註為需複核。",
+        "source_urls": [
+          "https://www.taifex.com.tw/file/taifex/CHINESE/4/AHTradeQA_ch.pdf",
+          "https://www.taifex.com.tw/cht/4/historyOfTrading"
+        ]
+      },
+      {
+        "topic": "期交稅",
+        "claim": "股價指數類期貨契約之期貨交易稅為每次交易「契約金額之十萬分之 2（0.002%）」，買方與賣方各課一次（單邊各收）。試算：指數 27,000 點時大台單邊稅 = 27,000×200×0.00002 = 108 元；若指數 44,000 點則大台單邊約 176 元、小台約 44 元、微台約 8.8 元，來回加倍。到期現金結算者按最後結算價計算。選擇權另按權利金千分之 1。",
+        "confidence": "high",
+        "evidence": "財政部稅務入口網、高雄/臺北國稅局頁面與期交所費率表一致記載十萬分之 2、向買賣雙方各課徵；稅率為法定固定值，時效性風險低（截至 2026-08 未見修法訊息）。",
+        "source_urls": [
+          "https://www.etax.nat.gov.tw/etwmain/tax-info/understanding/tax-saving-manual/national/future-transaction-tax/12B2ODn",
+          "https://www.ntbk.gov.tw/singlehtml/467fa29299ca48bc9ab74d1fc714b38b?cntId=55f6bfa2c8cc416e925a8fa68571ffcc",
+          "https://www.taifex.com.tw/cht/4/feeSchedules"
+        ]
+      },
+      {
+        "topic": "券商手續費行情",
+        "claim": "手續費無公定價、可議價（依交易量與開戶管道浮動）。2026 年一般散戶行情：大台約 40–50 元/口/單邊（來回約 80–100 元），小台約 20–35 元/口/單邊，微台更低（個位數至十餘元）。期貨商的底層成本（期交所交易經手費＋結算手續費）約為：大台 20 元、小台 12.5 元、微台 3.2 元/口/單邊，低於此的報價不可能長期存在。量化回測建議：大台單邊成本抓「手續費 45 元＋期交稅（指數×200×0.00002）」再加滑價 1 檔（200 元）較保守。",
+        "confidence": "medium",
+        "evidence": "多家期貨商/理財網站（StockFeel、itrader、康和期貨系列部落格）給出的 2026 行情區間一致落在上述範圍；但手續費屬議價項目、各家與各業務員不同，且部落格來源多為期貨營業員招攬頁，數字僅代表行情水準而非官方定價。期交所成本（20/12.5/3.2 元）引自業者整理，建議以期交所費率表原文複核。",
+        "source_urls": [
+          "https://www.stockfeel.com.tw/%E6%9C%9F%E8%B2%A8%E4%BA%A4%E6%98%93%E6%88%90%E6%9C%AC-%E4%BF%9D%E8%AD%89%E9%87%91-%E6%89%8B%E7%BA%8C%E8%B2%BB/",
+          "https://itrader.com.tw/futures-commision/",
+          "https://www.barits.com.tw/small-taiex-futures-guide/",
+          "https://www.taifex.com.tw/cht/4/feeSchedules"
+        ]
+      },
+      {
+        "topic": "保證金（2026 年最新水準）",
+        "claim": "依 2026-07-06 期交所公告後之水準：大台原始保證金 636,000 元、小台 159,000 元（維持 122,000 元）、微台 31,800 元；按維持/原始約 0.767 之慣例比率推算，大台維持約 488,000 元、微台維持約 24,400 元。2026 年因指數大漲（搜尋結果稱加權指數站上 44,000 點）保證金連續多次上調：1 月 356,000→374,000、5 月 526,000→578,000、6/18 再調、7 月調至 636,000。保證金約為契約價值的 7–8%，是全年變動最頻繁的參數，回測與資金控管務必以期交所「保證金一覽表」當期數字為準。",
+        "confidence": "medium",
+        "evidence": "小台 159,000/122,000（2026/07/06）與大台 636,000、微台 31,800 來自兩次獨立搜尋的網頁摘要（康和期貨部落格、PTT股票公社等），且 636,000=159,000×4、31,800=159,000/5 內部一致；1 月與 5 月調整數字來自風傳媒報導。惟「指數 44,000 點」與 7 月確切數字未能直接讀取期交所原始公告（本環境無法開網頁），大台/微台維持保證金為比率推算值，均建議上 taifex.com.tw 保證金一覽表複核。",
+        "source_urls": [
+          "https://www.taifex.com.tw/cht/5/indexMarging",
+          "https://www.storm.mg/article/11098258",
+          "https://www.storm.mg/article/11135776",
+          "https://pttstock.tw/taiwan-index-futures/",
+          "https://www.barits.com.tw/small-taiex-futures-guide/"
+        ]
+      },
+      {
+        "topic": "結算日與最後結算價（現行規則）",
+        "claim": "月契約最後交易日原則為到期月份第三個星期三，最後結算日＝最後交易日；到期契約當日僅交易至 13:30。最後結算價（FSP）＝最後結算日臺灣證交所「收盤前 30 分鐘」（13:00–13:30）內所揭示標的指數之簡單算術平均價：即 13:00（不含）至 13:25（含）每 5 秒一筆的揭示指數，加計 13:30 最後一筆收盤指數，取簡單平均。若現貨延後收盤或暫停交易，期交所得延長/調整取樣區間。",
+        "confidence": "high",
+        "evidence": "期交所英文版最後結算價公式頁與 FAQ 明載「simple arithmetic mean of the underlying index during the last 30 minutes before close」及異常時的替代規則；13:00–13:25 每 5 秒＋收盤指數的取樣細節見期交所中文 FAQ 與多家期貨商教學（永豐、康和）。",
+        "source_urls": [
+          "https://www.taifex.com.tw/enl/eng5/formulaIndex",
+          "https://www.taifex.com.tw/cht/5/formulaIndex",
+          "https://www.taifex.com.tw/cht/5/futIndxFSP",
+          "https://www.spf.com.tw/mktinfo/Futures/OA/teach-009.html"
+        ]
+      },
+      {
+        "topic": "最後結算價規則沿革（回測分段點）",
+        "claim": "規則至少改過兩次：(1) 上市初期（1998 起）FSP 以最後交易日次一營業日現貨「開盤特別報價/開盤價」為基礎；(2) 2008 年 12 月因防操縱改為「開盤後 15 分鐘內指數之平均價」（學術文獻明確記載此次變更）；(3) 之後再改為現行「最後交易日當日收盤前 30 分鐘平均」（結算日與最後交易日合一、改在下午結算）。第 (3) 次變更的確切生效日期經多次搜尋無法查得，需驗證——回測跨越 2008 年前後與早盤/尾盤結算兩制的樣本時，結算日行為（結算日早盤 vs 13:00–13:30 尾盤效應）不可混用。",
+        "confidence": "low",
+        "evidence": "SSRN 論文（Chung, Chang & Hsieh，Price Manipulation on Expiration: Evidence of TAIEX futures and options）記載「settlement price was changed from the opening price to the average price 15 min after market opening in December 2008 to restrict manipulation」，且發現改制後操縱行為仍存在；現行收盤前 30 分鐘規則見期交所官網。但「15 分鐘早盤制→收盤前 30 分鐘制」的切換日期在本次所有搜尋中均未找到明確公告日，僅能確定現行制度已行之多年。建議查期交所「交易制度發展沿革」頁或歷史公告確認。",
+        "source_urls": [
+          "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4670330",
+          "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4304170",
+          "https://www.taifex.com.tw/cht/4/historyOfTrading",
+          "https://www.taifex.com.tw/enl/eng5/formulaIndex"
+        ]
+      },
+      {
+        "topic": "價格指數特性與除息季逆價差",
+        "claim": "台股加權指數（TAIEX）為「發行量加權股價指數」，屬價格指數：成分股除息時基期不調整、點數直接蒸發，現金股利不回補指數。因期貨價格≈到期日指數的預期值，契約存續期內的「預期除息點數」會事先反映為期貨低於現貨的逆價差——這是結構性、可預期的成分，不是看空訊號，也不是可套利的錯價。除權息旺季集中在 6–8 月（近年因台積電等改採季配息，部分蒸發點數分散到 3/6/9/12 月），旺季單一契約逆價差可達百點以上（歷史案例：某年 7 月契約結算日逆價差 172 點；單日大盤除息蒸發約 30 點的例子亦有記載）。長期持有期貨多單會隨價差收斂「吸收」股利點數，有來源估約相當於每年 4% 的隱含配息。回測含意：(a) 以現貨指數對期貨計算基差訊號時必須先扣除預期股利點數，否則除息季會系統性誤判為悲觀；(b) 期現貨長期報酬比較應使用報酬指數（含息）而非 TAIEX。",
+        "confidence": "high",
+        "evidence": "元大期貨研究團隊「除權息季價差交易心法」PDF、StockFeel、國票期貨除權息懶人包等多來源一致說明機制；172 點逆價差案例來自部落格文章、每年 4% 估計來自單一部落格，屬示意性數字（medium 可信度的量化細節）；「發行量加權股價指數、除息不調整基期」見維基百科與臺灣指數公司頁面。逐年總蒸發點數的精確統計未查得，可用 HiStock 除息點數預估表逐年重建。",
+        "source_urls": [
+          "https://www.yuantafutures.com.tw/UploadFile/Artical/202305/1684806252053_%E3%80%90%E5%85%83%E5%A4%A7%E6%9C%9F_%E7%A0%94%E7%A9%B6%E5%9C%98%E9%9A%8A%E3%80%91%E9%99%A4%E6%AC%8A%E5%AD%A3%E5%83%B9%E5%B7%AE%E4%BA%A4%E6%98%93%E5%BF%83%E6%B3%95%202023.05.23.pdf",
+          "https://www.stockfeel.com.tw/%E6%9C%9F%E8%B2%A8-%E6%AD%A3%E5%83%B9%E5%B7%AE-%E9%80%86%E5%83%B9%E5%B7%AE/",
+          "https://zh.wikipedia.org/wiki/%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8",
+          "https://histock.tw/stock/exdividendtable.aspx",
+          "https://virtuemind.pixnet.net/blog/post/222876604",
+          "https://letf.com.tw/%E9%95%B7%E6%9C%9F%E6%8C%81%E6%9C%89%E5%8F%B0%E8%82%A1%E6%9C%9F%E8%B2%A8%EF%BC%8C%E6%AF%8F%E5%B9%B4%E5%8F%AF%E4%BB%A5%E5%90%B8%E6%94%B6%E5%88%B0%E3%80%8C4%EF%BC%85%E9%85%8D%E6%81%AF%E3%80%8D%EF%BC%81/"
+        ]
+      },
+      {
+        "topic": "回測用交易成本彙總（單邊，2026-08 時點）",
+        "claim": "以指數約 44,000 點估算單邊成本：大台＝手續費約 45 元＋期交稅約 176 元 ≈ 221 元 ≈ 1.1 點（來回約 2.2 點，未含滑價；加 1 檔滑價後來回約 3.2 點）；小台＝手續費約 25 元＋稅約 44 元 ≈ 69 元 ≈ 1.4 點（來回約 2.8 點）；微台手續費占比最高，每點僅 10 元，來回成本可達 2–4 點，對高頻策略最不利。大台的「每點成本比」最低，小台/微台以口數彈性換取較高的相對摩擦成本。",
+        "confidence": "medium",
+        "evidence": "由已驗證的稅率（0.002%）、乘數（200/50/10）與手續費行情（可議價區間）合成計算；點數換算隨指數水位與實際談到的手續費而變，屬合理估計而非官方數字。",
+        "source_urls": [
+          "https://www.etax.nat.gov.tw/etwmain/tax-info/understanding/tax-saving-manual/national/future-transaction-tax/12B2ODn",
+          "https://itrader.com.tw/futures-commision/",
+          "https://www.stockfeel.com.tw/%E6%9C%9F%E8%B2%A8%E4%BA%A4%E6%98%93%E6%88%90%E6%9C%AC-%E4%BF%9D%E8%AD%89%E9%87%91-%E6%89%8B%E7%BA%8C%E8%B2%BB/"
+        ]
+      }
+    ],
+    "summary": "台指期三兄弟規格明確：大台/小台/微台每點分別為 200/50/10 元、最小跳動皆 1 點，日盤 08:45–13:45、夜盤 15:00–次日 05:00，漲跌幅為前一日盤結算價 ±10%（日夜盤同基準）。交易成本方面，期交稅為契約金額十萬分之 2 且買賣各課一次，手續費可議價（大台單邊行情約 40–50 元、小台約 20–35 元）；保證金 2026 年隨指數大漲連續上調，7 月起大台原始保證金約 63.6 萬、小台 15.9 萬、微台 3.18 萬，此為全年變動最頻繁的參數，務必以期交所保證金一覽表為準。結算為每月第三個週三，最後結算價採當日現貨收盤前 30 分鐘（13:00–13:30、每 5 秒揭示）指數之簡單算術平均；沿革上 2008 年 12 月曾由開盤價制改為開盤後 15 分鐘平均制，之後才改為現行尾盤 30 分鐘制，但該次切換的確切日期搜尋不到、回測分段前需向期交所沿革頁驗證。最後，加權指數是不含息的價格指數，除息點數直接蒸發，因此 6–8 月除權息季的期貨逆價差主要是預期股利點數的結構性反映，基差類訊號必須先扣除預期股利，長期績效比較應改用含息報酬指數。"
+  },
+  "trend": {
+    "findings": [
+      {
+        "topic": "1. ORB開盤區間突破在台指期的實測（學術論文）",
+        "claim": "中正大學碩士論文（113CCU00304050）以大台指期2016/12/21~2025/05/21樣本驗證ORB日內策略：優化版ORB年化報酬率54.13%、最大回撤-19.31%、年化Sharpe 0.717；原始版架構已有正報酬，加突破濾網可提高勝率",
+        "confidence": "medium",
+        "evidence": "來自台灣博碩士論文知識加值系統搜尋摘要。屬單篇碩士論文回測，數字未經第三方複製驗證，54%年化極可能含參數優化的樣本內成分（過擬合風險高），實務應打折看待。時效：2025年論文，樣本至2025/5",
+        "source_urls": [
+          "https://ndltd.ncl.edu.tw/cgi-bin/gs32/gsweb.cgi/login?o=dnclcdr&s=id%3D%22113CCU00304050%22.&searchmode=basic"
+        ]
+      },
+      {
+        "topic": "1. ORB在台指期當沖（第二篇論文＋實務部落格）",
+        "claim": "另一篇論文（108TIT0030A037，約2019）顯示無濾網ORB在台指期當沖虧損-307.78萬元，加入濾網後轉為+43.63萬元——裸ORB不賺錢，濾網是關鍵；實務圈（程式交易快譯通、幣圖誌、統一期貨）有MultiCharts程式碼與Kelly資金管理討論",
+        "confidence": "medium",
+        "evidence": "論文摘要數字（以口數/資金規模未明，絕對金額僅供量級參考）。與中正論文結論方向一致：原始ORB邊際、需優化。時效：2019年論文",
+        "source_urls": [
+          "https://ndltd.ncl.edu.tw/cgi-bin/gs32/gsweb.cgi/login?o=dnclcdr&s=id=%22108TIT0030A037%22.&searchmode=basic",
+          "https://seekingalpha-tainan.blogspot.com/2017/07/opening-range-breakoutorb.html",
+          "https://www.bituzi.com/2013/10/ORBkelly.html?m=0"
+        ]
+      },
+      {
+        "topic": "1. 均線法則在台指期/台股的學術實測",
+        "claim": "多篇研究支持均線法則在台灣市場「歷史上」有預測力：(a) MDPI Eng. Proc. 2024以台指期2000-2022做walk-forward參數選擇研究；(b) 朝陽科大論文：不計交易成本下MA(10,30)最佳；(c) 42日均線策略綜合績效勝過買進持有（華藝）；(d) 台大資工論文以台指期1999-2007測MA/KD/RSI/MACD獲利性",
+        "confidence": "medium",
+        "evidence": "均為論文層級，多數未充分處理交易成本與資料窺探(data snooping)；「不計成本下最佳」這類結論在計入期貨來回成本（台指期單邊稅萬分之0.2+手續費，滑價1-2點）後會大幅縮水。時效：資料多止於2007-2022",
+        "source_urls": [
+          "https://doi.org/10.3390/engproc2024074056",
+          "https://ir.lib.cyut.edu.tw/bitstream/310901800/29961/1/101CYUT5304022-001.pdf",
+          "https://www.airitilibrary.com/Article/Detail/U0002-2206201218211800",
+          "https://www.csie.ntu.edu.tw/~lyuu/theses/thesis_j94922029.pdf"
+        ]
+      },
+      {
+        "topic": "1+3. 經典跨國證據：技術法則在台灣曾顯著有效（含量級）",
+        "claim": "Bessembinder & Chan (1995, Pacific-Basin Finance Journal 3:257-284)：均線與區間突破法則在馬來西亞、泰國、台灣等新興市場最有效，買訊日-賣訊日平均報酬差約0.095%/日（年化約26.8%），損益兩平來回交易成本約1.57%；且美國市場的技術訊號對亞股報酬有額外預測力",
+        "confidence": "high",
+        "evidence": "發表於正式期刊、被廣泛引用的經典研究。重大時效警告：樣本為1975-1991年代，30年前的市場效率遠低於今日，此量級不可直接外推到2020年代",
+        "source_urls": [
+          "https://www.sciencedirect.com/science/article/abs/pii/0927538X95000023",
+          "https://www.scirp.org/reference/referencespapers?referenceid=4044554"
+        ]
+      },
+      {
+        "topic": "2. 台股是「動能失效」的著名例外市場",
+        "claim": "學術界廣泛記載台灣是橫斷面動能(cross-sectional momentum)的顯著例外：Chui, Titman & Wei (2010, Journal of Finance)將東亞（含台灣）動能利潤低歸因於低個人主義文化；另有專文《Why is there no momentum in the Taiwan stock market?》與《Momentum in Taiwan: Seasonality matters!》(J. of Economics and Business 2009)；PBFJ 2023《Revisiting the momentum effect in Taiwan》發現僅約50%的贏家/輸家股具持續性，至少四分之一呈反轉(contrarian)效果",
+        "confidence": "high",
+        "evidence": "多篇頂級與區域期刊互相印證，是文獻共識。注意：這是「個股橫斷面動能」，與指數層級的時間序列動能(time-series momentum)是不同概念，不能直接推論台指期順勢必然失效",
+        "source_urls": [
+          "https://onlinelibrary.wiley.com/doi/abs/10.1111/j.1540-6261.2009.01532.x",
+          "https://experts.nau.edu/en/publications/why-is-there-no-momentum-in-the-taiwan-stock-market",
+          "https://ideas.repec.org/a/eee/jebusi/v61y2009i2p140-152.html",
+          "https://www.sciencedirect.com/science/article/abs/pii/S0927538X23000094"
+        ]
+      },
+      {
+        "topic": "2. 短期(週/月內)動能vs反轉：台灣與多數亞股不同",
+        "claim": "《Short-horizon contrarian and momentum strategies in Asian markets》(Int. Rev. of Financial Analysis, 樣本1990-2000)發現：日韓港星馬泰的贏家組合短期反轉、輸家組合有動能，但台灣與韓國是例外；PBFJ 2023研究進一步發現台股「日內動能(IMOM)顯著為正、隔夜動能(OMOM)顯著為負」，效果可持續至一年",
+        "confidence": "medium",
+        "evidence": "兩篇期刊論文。前者樣本已25年前；後者(2023)較新且對「日盤vs夜盤報酬結構」有直接策略含義：台股的動能利潤主要來自日內成分，隔夜成分是負貢獻",
+        "source_urls": [
+          "https://www.sciencedirect.com/science/article/abs/pii/S1057521906000433",
+          "https://www.sciencedirect.com/science/article/abs/pii/S0927538X23002226"
+        ]
+      },
+      {
+        "topic": "2. TAIEX日/週線自相關與隨機漫步檢定",
+        "claim": "Chang & Ting (2000, Applied Financial Economics 10(5))用Lo-MacKinlay變異數比檢定TAIEX 1971-1996：週報酬拒絕隨機漫步（正自相關、VR>1，偏動能），月/季/年頻率無法拒絕；且自相關在1990年後下降，與漲跌幅限制寬度呈反向關係（漲跌停制度造成的價格延遲反映是正自相關的重要來源）",
+        "confidence": "high",
+        "evidence": "正式期刊論文。時效警告：樣本止於1996，當時漲跌停限制為7%（2015年已放寬至10%），且市場效率提升，近年日線正自相關幅度應已明顯減弱——這正是需要用新資料回測驗證的點",
+        "source_urls": [
+          "https://www.tandfonline.com/doi/abs/10.1080/096031000416406",
+          "https://www.researchgate.net/publication/24070391_A_Variance_Ratio_Test_of_the_Random_Walk_Hypothesis_for_Taiwan's_Stock_Market"
+        ]
+      },
+      {
+        "topic": "2. 日內時間序列動能（第一個半小時預測最後半小時）",
+        "claim": "Gao-Han-Li-Zhou (2018, JFE)在SPY記錄「首個半小時報酬預測末個半小時」的日內動能；台灣ETF的後續研究發現台灣也存在日內時序動能，但控制法人與外資交易行為後，首半小時對末半小時的預測力消失——台灣的日內動能主要由機構資金流驅動",
+        "confidence": "medium",
+        "evidence": "JFE原始論文可信度高；台灣ETF延伸研究來自搜尋摘要，具體期刊與樣本期間未能確認，需驗證。對台指期當沖策略設計（尾盤順勢）有直接參考價值",
+        "source_urls": [
+          "https://www.sciencedirect.com/science/article/abs/pii/S0304405X18301351",
+          "https://www.sciencedirect.com/science/article/abs/pii/S1544612319304337",
+          "https://alphaarchitect.com/attention-prop-traders-the-first-half-hour-of-trading-predicts-the-last-half-hour/"
+        ]
+      },
+      {
+        "topic": "3. 常見參數與實測報酬量級（部落格/專題實測）",
+        "claim": "具體量級數字：(a) 致理科大專題：20/60日均線交叉於台股10年回測累積報酬約+20%、年化僅約1.84%；(b) 券商/部落格宣稱單一均線交叉訊號在台股大盤歷史勝率約54-58%，加量能濾網後可達72%（未驗證）；(c) Selene部落格宣稱台指期順勢留倉策略十年淨利498萬、MDD約15萬（極可能過擬合或倖存者偏差）；(d) 海龜/Donchian常用參數：20日突破進場/10日出場、55日/20日，部落格普遍認為原版海龜在近年台指期已無獲利能力",
+        "confidence": "low",
+        "evidence": "皆為學生專題、券商行銷或個人部落格，方法論與成本假設不透明；MDD 15萬對淨利498萬的比例好到不合理，應視為上限幻象。可信的基準量級：純長線均線交叉策略在指數上年化多為低個位數%（與(a)一致），大幅落後買進持有的長期年化約8-10%",
+        "source_urls": [
+          "https://chihleeir.chihlee.edu.tw/bitstream/310993300Q/3338/2/%E6%99%BA%E6%85%A7%E6%8A%95%E8%B3%87%E7%A0%94%E7%A9%B6-%E4%BB%A5%E5%A4%A7%E6%95%B8%E6%93%9A%E5%88%86%E6%9E%90%E8%82%A1%E5%B8%82%E4%BA%A4%E5%8F%89%E9%BB%9E%E7%82%BA%E4%BE%8B.pdf",
+          "https://efxselects.com/golden-cross-taiwan-stock-guide/",
+          "https://blog.xuite.net/cuteselene/multicharts/472267247-台指期策略分享+B_02",
+          "https://edgetradertw.com/donchian-channel-%E5%94%90%E5%A5%87%E5%AE%89%E9%80%9A%E9%81%93-%E6%B5%B7%E9%BE%9C%E4%BA%A4%E6%98%93%E6%B3%95%E7%9A%84%E6%A0%B8%E5%BF%83/"
+        ]
+      },
+      {
+        "topic": "4. 台指期夜盤制度事實",
+        "claim": "台灣期交所於2017/5/15開放盤後交易（夜盤），股價指數類商品交易時段15:00~次日05:00，全日交易19小時，可完整覆蓋歐美股市開收盤；開放動機之一是投資人先前需轉往新加坡摩台指避險隔夜風險",
+        "confidence": "high",
+        "evidence": "期交所官方網站資訊，制度性事實。含義：2017/5之後的台指期資料才有夜盤，回測跨此日期需注意結構斷點",
+        "source_urls": [
+          "https://www.taifex.com.tw/cht/4/aHIntroduction",
+          "https://www.taifex.com.tw/enl/eng4/historyOfTrading"
+        ]
+      },
+      {
+        "topic": "4. 夜盤與日盤的價格連續性/資訊傳遞（學術）",
+        "claim": "2024年研究《The price continuity, return and volatility spillover effects of regular and after-hours trading》發現：日盤與夜盤間存在價格連續性，日盤常決定夜盤價格區間，而夜盤價格變化可為次日日盤決策提供資訊；但夜盤流動性差、避險成本高。另Physica A (2012)《The overnight effect on the Taiwan stock market》發現台股日間報酬方向與隔夜報酬方向呈負交叉相關",
+        "confidence": "medium",
+        "evidence": "前者為2024年peer-reviewed論文（PMC收錄），直接支持「夜盤含次日資訊」；後者樣本較舊(2012年前)。合併PBFJ 2023的「隔夜動能為負」，指向：台指隔夜報酬與日盤報酬傾向反向，不宜天真地把夜盤漲跌直接外推為次日日盤方向",
+        "source_urls": [
+          "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10927114/",
+          "https://www.sciencedirect.com/science/article/abs/pii/S0378437112006723"
+        ]
+      },
+      {
+        "topic": "4. 美股對次日台股的領先關係",
+        "claim": "多篇Granger因果研究顯示美股價格變動可預測台股次日走勢，且美國對台灣的影響大於日本對台灣；Bessembinder & Chan (1995)亦發現美國技術訊號對亞股（含台灣）有超越本地訊號的預測力；實務上台積電ADR（權重效應）與美期指是夜盤/次日開盤最常用的領先指標，但實務文章一致提醒「夜盤漲跌不能直接當隔日方向」",
+        "confidence": "medium",
+        "evidence": "學術方向一致（美→台單向領先為主），但多數研究樣本在2000年代以前；「美股隔夜報酬→台指開盤跳空」的相關性極高是市場常識，但具體相關係數的嚴謹新研究未在搜尋中找到，需自行用資料估計（預期開盤跳空與前夜S&P/NQ報酬相關係數量級0.6-0.8，此為待驗證假設而非文獻數字）",
+        "source_urls": [
+          "https://www.sciencedirect.com/science/article/abs/pii/S1042443197000279",
+          "https://www.worldscientific.com/doi/abs/10.1142/S0219091506000732",
+          "https://www.sciencedirect.com/science/article/abs/pii/0927538X95000023",
+          "https://udn.com/news/story/7255/9642380"
+        ]
+      },
+      {
+        "topic": "研究方法備註：本地實務生態",
+        "claim": "台灣程式交易實務圈以MultiCharts為主流（量化通QuantPass、統一期貨、期權加油站等），常見台指期回測慣例：2018年後樣本、計入手續費+滑價、以「淨利/最大策略虧損比」為主要指標；QuantPass課程含約40支台指期策略範例（動能/當沖/ORB類），但完整績效數字在付費牆內",
+        "confidence": "high",
+        "evidence": "多個實務網站互相印證的生態事實。含義：可比較基準——實務圈認為日內動能策略在計成本後年化Sharpe能到0.7-1已屬佳作，與中正ORB論文的0.717一致",
+        "source_urls": [
+          "https://quantpass.org/mc_lesson_strategy_txfs/",
+          "https://quantpass.org/txf/",
+          "https://www.pfcf.com.tw/featured/l/202?page=2"
+        ]
+      }
+    ],
+    "summary": "文獻證據呈現清晰的分層結構：台灣個股的橫斷面動能是全球著名的「失效例外」（Chui-Titman-Wei 2010等多篇頂刊），但這不等於指數層級順勢無效——早期經典研究（Bessembinder & Chan 1995：買賣訊號日報酬差年化約26.8%；Chang & Ting 2000：週線正自相關拒絕隨機漫步）顯示TAIEX歷史上偏動能，惟該正自相關與漲跌停制度相關且1990年後已明顯減弱，近年新資料需重新驗證。實測量級方面：長線20/60均線交叉在台股十年回測年化僅約1.84%，遠遜買進持有；而日內ORB是台指期論文與實務圈最有共識的動能策略，2025年中正大學論文報告優化後年化54.13%、MDD -19.31%、Sharpe 0.717（過擬合風險高，另一論文顯示無濾網ORB是虧損的）。夜盤（2017/5/15開放，15:00-05:00）與美股高度連動、含次日資訊，學術上美股對台股為單向領先，但2023年PBFJ研究發現台股「日內動能為正、隔夜動能為負」，暗示隔夜報酬與日盤傾向反向，策略上應把「跳空後的日盤行為」與「隔夜方向」分開建模。整體建議：優先測試日內ORB/尾盤動能與帶濾網的中長期突破，並把美股隔夜報酬作為狀態變數而非直接訊號；所有部落格宣稱的高績效（如十年淨利498萬/MDD 15萬）應視為不可信的上限。"
+  },
+  "meanrev": {
+    "findings": [
+      {
+        "topic": "星期效應（台股/台指期）",
+        "claim": "台灣的星期效應證據存在但不穩定且隨時間衰退：碩士論文顯示2000-2008年間週一效應仍存在但週五效應消失；另一研究(2001-2007)認為星期效應已不顯著（週一、週二平均日報酬為負、週五最高）；1995-2012研究發現排除電子股後週二有顯著負報酬。無近10年(2015後)針對台指期日盤+夜盤的公開嚴謹更新研究。",
+        "confidence": "medium",
+        "evidence": "多篇台灣博碩士論文與期刊摘要（樣本期間各異、結論互相衝突），皆為2013年以前樣本，時效性差，需以自有資料重新檢驗",
+        "source_urls": [
+          "https://ndltd.ncl.edu.tw/handle/7smrj9",
+          "https://www.airitilibrary.com/Article/Detail/U0061-1906201316210400",
+          "https://www.airitilibrary.com/Publication/alDetailedMesh?docid=U0005-2106201301061600"
+        ]
+      },
+      {
+        "topic": "月轉換效應（turn-of-month）",
+        "claim": "國際證據強：Lakonishok & Smidt (1988) 發現DJIA 1897-1986全部正報酬集中在月底最後一日至次月第3日；近年國際統計約月轉換4日窗口平均日報酬~12bp、其他日近零。台灣專屬證據薄弱：僅找到樂透型股票研究(2009-2018，Airiti)顯示月轉換效應在農曆一月較顯著；未找到任何針對台指期TXF的公開月轉換效應量化研究。",
+        "confidence": "medium",
+        "evidence": "國際文獻(高信心)與台灣個股層級研究(中信心)；TXF層級為研究空白，屬「不確定需自行驗證」",
+        "source_urls": [
+          "https://quantifiedstrategies.substack.com/p/what-is-the-turn-of-the-month-effect",
+          "https://www.airitilibrary.com/Article/Detail/P20180322001-202012-202011190003-202011190003-25-49",
+          "https://quantpedia.com/strategies/turn-of-the-month-in-equity-indexes"
+        ]
+      },
+      {
+        "topic": "月份季節性（加權指數）",
+        "claim": "媒體統計(1987-2025約39年，UDN 2024報導)：台股最易上漲時段為11月至隔年3月；12月上漲機率77%、2/3月約67%、1月58%；但近十年1月平均報酬僅約0.87%（元月效應不顯著，鉅亨網）；9-10月為全球性弱勢月份。Goodinfo提供加權指數逐月漲跌機率原始統計表可供交叉驗證。",
+        "confidence": "medium",
+        "evidence": "財經媒體統計非同儕審查，且勝率型統計未控制趨勢性多頭偏誤；數字時效至2024-2025",
+        "source_urls": [
+          "https://udn.com/news/story/7251/9283817",
+          "https://news.cnyes.com/news/id/6291088",
+          "https://goodinfo.tw/tw/StockHisAnaMonth.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8"
+        ]
+      },
+      {
+        "topic": "跳空缺口回補統計",
+        "claim": "確定的事實：台指期/台股「缺口回補」缺乏公開的嚴謹統計研究——搜尋(中英文多組關鍵字)僅找到教學型文章，流傳的「95%以上缺口終會回補」「普通缺口幾乎必補、突破缺口極少補」皆為無明確樣本與期限定義的坊間說法，不可直接引用。反面證據：2026年MNQ期貨系統性檢驗(arXiv 2605.04004)發現隔夜缺口在日內回補與續行方向機率相當，gap-fill假說不成立。",
+        "confidence": "high",
+        "evidence": "「公開嚴謹研究不存在」經多次不同關鍵字搜尋確認(高信心)；坊間回補率數字本身為低信心，必須用自有TXF資料(區分8:45期貨開盤vs9:00現貨開盤、日盤vs夜盤缺口)自行回測",
+        "source_urls": [
+          "https://arxiv.org/pdf/2605.04004",
+          "https://jyforex.com/gap-filling/",
+          "https://www.stockfeel.com.tw/%E8%B7%B3%E7%A9%BA%E7%BC%BA%E5%8F%A3-%E7%BC%BA%E5%8F%A3-%E5%A4%9A%E6%96%B9%E7%BC%BA%E5%8F%A3-%E7%A9%BA%E6%96%B9%E7%BC%BA%E5%8F%A3/"
+        ]
+      },
+      {
+        "topic": "布林通道/RSI逆勢策略實證",
+        "claim": "學術面：Physica A (2020)〈The profitability of Bollinger Bands: Evidence from the constituent stocks of Taiwan 50〉發現觸及下軌買進有顯著正異常報酬（逆勢用法優於順勢）；但Fang等研究顯示扣除交易成本後布林通道普遍無法勝過買進持有，逆勢版僅「改善」績效。台指期專屬：僅商業性回測（量化通QuantPass的TXF布林逆勢/RSI策略電子書，MultiCharts回測2020/1/1-2026年間、30-60分K、單邊成本NT$500），細節付費、未經獨立驗證。",
+        "confidence": "medium",
+        "evidence": "同儕審查期刊為個股層級非期貨(中高信心)；TXF層級只有付費商業回測(低信心)，屬需自行驗證項目",
+        "source_urls": [
+          "https://www.sciencedirect.com/science/article/abs/pii/S0378437120300078",
+          "https://acfr.aut.ac.nz/__data/assets/pdf_file/0007/29896/100009-Popularity-vs-Profitability-BB-August-Final.pdf",
+          "https://quantpass.org/product/ebook_innovation_14/"
+        ]
+      },
+      {
+        "topic": "結算日(到期日)效應",
+        "claim": "學術證據紮實：台指期最後結算日之波動率與成交量顯著高於平日(JIFMIM 2008，TAIFEX與SGX摩台雙市場研究)；Springer RQFA (2013)〈Expiration day effects and market manipulation: Evidence from Taiwan〉發現到期效應部分可歸因於「marking the close」式操縱；研究並指出改用較長時段均價結算可緩解到期效應。台灣特有：因結算機制，效應在結算日本身最明顯。",
+        "confidence": "high",
+        "evidence": "多篇同儕審查期刊；惟樣本多在2010年以前，夜盤(2017起)與週結算商品普及後的現代格局需重新驗證",
+        "source_urls": [
+          "https://www.sciencedirect.com/science/article/abs/pii/S1042443106000552",
+          "https://link.springer.com/article/10.1007/s11156-012-0314-z",
+          "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1543914",
+          "https://finance.cyut.edu.tw/var/file/25/1025/img/158/2005-1-03.pdf"
+        ]
+      },
+      {
+        "topic": "結算制度（確定事實）",
+        "claim": "台指期月合約於每月第三個週三結算，13:30停止交易；最後結算價=結算日13:00-13:30加權指數每5秒一價共301個價格之簡單算術平均（TAIFEX官方規則）。週三到期之週選擇權行之有年，且期交所2025-06-27新上市「週五到期臺指選擇權」形成雙到期日——即目前每週三、週五都有結算微結構事件，設計結算行情策略時需納入。",
+        "confidence": "high",
+        "evidence": "TAIFEX官方文件與多家期貨商教學頁一致；週五到期TXO上市日期經多來源確認(2025-06-27)",
+        "source_urls": [
+          "https://www.taifex.com.tw/cht/5/formulaStock",
+          "https://www.spf.com.tw/mktinfo/Futures/OA/teach-009.html",
+          "https://www.esunsec.com.tw/article/post/328",
+          "https://tw.stock.yahoo.com/news/%E5%8F%B0%E6%8C%87%E6%9C%9F-%E9%9B%99%E5%88%B0%E6%9C%9F%E6%97%A5-%E9%81%BF%E9%9A%AA%E6%9B%B4%E5%BD%88%E6%80%A7-%E5%91%A8%E4%BA%94%E5%88%B0%E6%9C%9F%E5%8F%B0%E6%8C%87%E9%81%B8%E6%93%87%E6%AC%8A%E4%BB%8A%E4%B8%8A%E5%B8%82-040458651.html"
+        ]
+      },
+      {
+        "topic": "除權息季(6-8月)期貨價差",
+        "claim": "機制確定：6-8月除息旺季，預期蒸發點數反映於期貨→系統性逆價差，且逆價差隨填息/時間自然收斂，本身不是可交易的alpha。具體數字：2026年7月8日CNA報導7月台指期收45564、逆價差170.41點；2026年6-8月台指期累計除息影響點數估約175-256點、電子期至8月約17.4點（康和期貨估算，時效2026年中）；值得注意2026年遠月合約一度出現正價差，顯示多方預期強到抵消除息扣點。HiStock維護逐年除息點數預估表；元大期貨2023-05有〈除權季價差交易心法〉研究PDF。",
+        "confidence": "high",
+        "evidence": "機制與當期數字有新聞/期貨商來源；蒸發點數為估計值會隨股利公告滾動修正，回測時應以TAIFEX/證交所實際資料重建",
+        "source_urls": [
+          "https://www.cna.com.tw/news/afe/202607080178.aspx",
+          "https://dolag.com.tw/2026%E9%99%A4%E6%81%AF.html",
+          "https://histock.tw/stock/exdividendpoint.aspx",
+          "https://www.yuantafutures.com.tw/UploadFile/Artical/202305/1684806252053_%E3%80%90%E5%85%83%E5%A4%A7%E6%9C%9F_%E7%A0%94%E7%A9%B6%E5%9C%98%E9%9A%8A%E3%80%91%E9%99%A4%E6%AC%8A%E5%AD%A3%E5%83%B9%E5%B7%AE%E4%BA%A4%E6%98%93%E5%BF%83%E6%B3%95%202023.05.23.pdf"
+        ]
+      },
+      {
+        "topic": "日內均值回歸相關文獻",
+        "claim": "跨市場文獻〈Overnight-Intraday Reversal Everywhere〉(SSRN, Liu/Liu/Wang/Zhou/Zhu)：做多隔夜報酬最低、放空最高者的日內反轉策略，Sharpe為傳統短期反轉的2-5倍，機制歸因於流動性提供；另有台灣ETF研究發現日內時序動能（前日尾盤半小時報酬可預測隔日前段報酬）。台指期本身的隔夜-日內反轉尚無公開專屬研究，為可複製驗證的候選策略。",
+        "confidence": "medium",
+        "evidence": "SSRN工作論文與期刊研究，非台指期直接證據；適合作為策略假說來源",
+        "source_urls": [
+          "https://papers.ssrn.com/sol3/Delivery.cfm/2730304.pdf?abstractid=2730304",
+          "https://www.sciencedirect.com/science/article/pii/S2214845023000029"
+        ]
+      },
+      {
+        "topic": "民間結算日策略研究",
+        "claim": "幣圖誌Bituzi (2014-06)有〈台指期到期日(結算日)效應研究〉：檢驗結算前N個交易日進場、抱到結算日收盤的歷史績效，是少數公開的TXF結算效應回測，但為2014年前樣本且勝率細節需進站閱讀，時效性差。",
+        "confidence": "low",
+        "evidence": "部落格回測，方法與樣本細節未能於搜尋摘要中確認，僅作為策略構想參考",
+        "source_urls": [
+          "https://www.bituzi.com/2014/06/tx-settle-day-strategy.html"
+        ]
+      },
+      {
+        "topic": "市場現況（回測參數校準用）",
+        "claim": "2026-07-31 TAIEX收在40,000點以下（當日劇烈震盪後跌破4萬，Taipei Times）；2026年市場經歷單月近8,000點的大幅回落，台指期夜盤多次單日振幅400-1000點。在此波動水準下，日內策略的停損與成本假設（每點NT$200大台）需用近期資料重新校準。",
+        "confidence": "high",
+        "evidence": "2026年7月底新聞報導，時效性佳",
+        "source_urls": [
+          "https://www.taipeitimes.com/News/biz/archives/2026/07/31/2003861667",
+          "https://finance.biggo.com/news/fa4a8eee-583f-4d83-8bc3-1a9104f8407d"
+        ]
+      }
+    ],
+    "summary": "四大主題中，證據最紮實的是「結算日效應」：同儕審查文獻確認台指期最後結算日波動與量能顯著偏高，且部分源於marking-the-close式操縱；制度面確定事實為月合約第三個週三結算、最後結算價採13:00-13:30共301個5秒snapshot的算術平均，且2025-06-27起新增週五到期選擇權形成每週三/週五雙結算事件。「除權息季逆價差」是機制性、確定的現象（2026年6-8月估計蒸發約175-256點、7月合約逆價差約170點），逆價差收斂本身不是alpha，反而2026年出現的罕見正價差是情緒訊號。相對地，「月轉換效應與星期效應」在台灣只有2013年以前、結論互相衝突的論文證據，「跳空缺口回補率」與「RSI/布林逆勢在TXF」則完全沒有公開嚴謹統計（僅坊間說法與付費商業回測，且MNQ的系統性研究否定gap-fill假說），這三者應列為需用自有TAIEX/TXF資料驗證的假說而非既定事實。建議回測時特別處理：期貨8:45開盤vs現貨9:00的缺口定義、2017年後夜盤結構改變、以及勝率型季節性統計中的多頭趨勢偏誤。"
+  },
+  "flows": {
+    "findings": [
+      {
+        "topic": "1. 外資期貨淨未平倉：學術實證",
+        "claim": "台灣碩士論文（約2012，Airiti收錄）以Granger因果、衝擊反應與變異數分解實測：台指期（一階差分）與外資淨未平倉呈『雙向回饋』關係；外資淨部位對台指期預測誤差變異數的解釋比率約1.43%，遠高於自營商的0.015%；將外資淨未平倉納入程式交易策略回測，當沖與波段持倉績效均有顯著改善。另有2025年高科大碩論以2021/1/4–2025/2/27日資料研究外資淨未平倉與台指期收盤價的動態關係（細節未能於摘要取得）。",
+        "confidence": "medium",
+        "evidence": "僅取得論文摘要層級資訊（WebSearch snippet），未讀全文；1.43% vs 0.015%為摘要明載數字。解釋力雖顯著但絕對值很小，暗示外資OI是弱訊號而非強預測子。",
+        "source_urls": [
+          "https://www.airitilibrary.com/Article/Detail/U0001-0708201223163800",
+          "https://ndltd.ncl.edu.tw/cgi-bin/gs32/gsweb.cgi?o=dnclcdr&s=id%3D%22114NKUS0305005%22.&searchmode=basic"
+        ]
+      },
+      {
+        "topic": "1. 外資期貨淨未平倉：國際期刊證據",
+        "claim": "Journal of Futures Markets 2025（Wang）以小波分解台灣期貨市場法人情緒，發現『長期尺度』的法人情緒變化對台指期與大盤報酬有顯著樣本內外預測力，優於buy-and-hold與未分解情緒。較早期研究（JFM 2015等）指出：外資(FINI)在期貨市場屬負回饋交易者、其淨交易量對台指期報酬有顯著正向影響；外資交易的報酬預測力強於本土法人。實務上外資通常先在台指期建倉再進出現貨，故外資期貨OI可視為其現貨佈局的領先指標（TEJ觀點）。",
+        "confidence": "medium",
+        "evidence": "來自期刊摘要與TEJ英文文章snippet；未驗證全文與樣本期。方向（外資較有資訊內涵）在多篇獨立文獻中一致，可信度較高；具體效應量未知。",
+        "source_urls": [
+          "https://onlinelibrary.wiley.com/doi/10.1002/fut.22580",
+          "https://ideas.repec.org/a/wly/jfutmk/v35y2015i3p222-244.html",
+          "https://www.tejwin.com/en/insight/three-major-institutional-investors-position-based-trading-strategy-for-taiex-futures/"
+        ]
+      },
+      {
+        "topic": "1. 外資期貨淨未平倉：實務回測與重要陷阱",
+        "claim": "TEJ 2025年量化文章以2016/1/1–2025/10/1回測『三大法人OI門檻+ATR 90%分位波動濾網』的台指期策略（淨口數絕對值超過門檻才進場，高波動時清倉停用），顯示法人籌碼可轉化為可交易訊號（確切年化/夏普數字未能自摘要取得）。實務共識陷阱：外資期貨空單有很大部分是龐大現貨部位的避險/套利（正價差時空期貨買現貨），淨空單≠看空，必須搭配外資現貨買賣超一起判讀；外資淨空單歷史極端值約8.3萬口（2025-2026年新聞提及78,699口、8萬口等水位）。",
+        "confidence": "medium",
+        "evidence": "TEJ回測設計細節來自文章摘要，績效數字未取得需自行開啟原文；『避險空單』caveat為多個獨立實務來源（zonewallet、PTT、券商解讀）一致說法，此點可信度高。",
+        "source_urls": [
+          "https://www.tejwin.com/insight/%E4%B8%89%E5%A4%A7%E6%B3%95%E4%BA%BA%E7%B1%8C%E7%A2%BC%E9%9D%A2%E5%8F%B0%E6%8C%87%E6%9C%9F%E8%B2%A8%E4%BA%A4%E6%98%93%E7%AD%96%E7%95%A5/",
+          "https://www.zonewallet.io/article/foreign-open-positions",
+          "https://www.zonewallet.io/article/foreign-futures-short",
+          "https://mcsm.multicharts.com.tw/articles/5"
+        ]
+      },
+      {
+        "topic": "2. Put/Call比：定義、常用門檻",
+        "claim": "台灣實務慣例（站在賣方莊家角度解讀）：未平倉PCR>100%（>1.0）視為偏多（Put OI多=莊家敢賣put=有支撐），<1.0偏空；部分實務者用1.2/0.8做強弱門檻，量化通(QuantPass)提出成交量PCR<0.6為減多/偏空警戒，且強調門檻應依多空環境與近12–24個月均值『動態調整』而非固定。實務與學術皆認為『未平倉PCR比成交量PCR更有預測效果』。注意台灣OI-PCR方向解讀與美股（PCR高=恐慌=反向偏多）不同，是順著造市者部位的『順向』解讀。",
+        "confidence": "medium",
+        "evidence": ">1.0偏多/<1.0偏空與賣方視角在optree、opop、gooptions、PTT等多來源一致（可信度較高）；0.6與1.2/0.8等具體門檻僅見於個別實務網站，未見嚴謹回測支持，屬經驗法則。",
+        "source_urls": [
+          "https://quantpass.org/put-call-ratio/",
+          "https://gooptions.cc/put-call-ratio/",
+          "https://opop.tw/options-oi-pcr-ratio/",
+          "https://www.taifex.com.tw/cht/3/pcRatio",
+          "https://www.ptt.cc/bbs/Stock/M.1671967988.A.3FC.html"
+        ]
+      },
+      {
+        "topic": "2. Put/Call比：學術實證與有效性限制",
+        "claim": "學術文獻（ScienceDirect：JIFMIM 2014、Pacific-Basin 2016等）發現：在TXO市場中，四類交易人裡『只有外資』的put-call（open-buy）成交量比對次日TAIEX報酬有顯著預測力（外資volume-PCR與次日報酬負相關）；整體市場PCR的預測力弱。Pacific-Basin Finance Journal 2025研究顯示PCR可用於改善台指選擇權『賣方策略』績效（低風險高報酬的篩選條件）。反面證據：MacroMicro用戶回歸（2001年起）顯示OI-PCR與加權指數相關係數僅0.482，且PCR約『落後』指數14天——即整體PCR更像同時/落後指標而非領先指標。",
+        "confidence": "medium",
+        "evidence": "學術結論來自摘要層級；『只有外資PCR有預測力』與『整體PCR偏落後』兩者互相呼應，對『拿公開總體PCR當領先訊號』構成警告。0.482/落後14天出自MacroMicro UGC圖表，方法未經審查，僅供參考。",
+        "source_urls": [
+          "https://www.sciencedirect.com/science/article/abs/pii/S1042443114000389",
+          "https://www.sciencedirect.com/science/article/abs/pii/S0927538X16300415",
+          "https://www.sciencedirect.com/science/article/abs/pii/S0927538X25000241",
+          "https://en.macromicro.me/charts/73304/tai-wan-xuan-ze-quan-jiao-yi-zhong-de-Put-Call-wei-ping-cang-bi-lyu-dui-tai-gu-de-ying-xiang-fen-xi"
+        ]
+      },
+      {
+        "topic": "3. 散戶多空比：計算方式與回測結果",
+        "claim": "標準算法：散戶部位=小台(MTX)全市場未平倉−三大法人未平倉；散戶多空比=(散戶多單−散戶空單)/小台全市場OI。FinLab 2026-06-18文章用期交所資料重建13年（大台+小台）回測：(1)『大台』散戶多空比其實是大戶避險部位的鏡像、性質偏順勢——大台散戶偏多時0050後20日年化報酬23.3%（順勢加碼訊號）；(2)只有『小台』極端值適合反向——小台散戶極度看空後0050後20日年化32.1%；(3)兩訊號分開用的『智慧曝險』策略2018–2026年化32.5%、Sortino 2.13，優於0050的25.05%且回檔較小。另一實務來源稱多空比>+20%或<−20%且散戶OI>10,000口時反指標準確度才明顯提高。",
+        "confidence": "medium",
+        "evidence": "計算公式為多來源一致（高可信）；FinLab具體數字來自單一來源的自家回測（含2026年資料，時效新），未經獨立複製；±20%/萬口門檻為gooptions經驗值無嚴謹檢定。重要細節：『散戶=非三大法人』的殘差還包含中實戶與未分類法人，稱之散戶是近似。",
+        "source_urls": [
+          "https://finlab.finance/blog/retail-long-short-ratio",
+          "https://www.sinotrade.com.tw/richclub/FinLab/%E6%95%A3%E6%88%B6%E5%80%91%E7%9C%9F%E7%9A%84%E6%98%AF%E5%8F%8D%E6%8C%87%E6%A8%99%E5%97%8E--%E6%95%99%E4%BD%A0%E5%88%A9%E7%94%A8%E5%B0%8F%E5%8F%B0%E6%95%A3%E6%88%B6%E5%A4%9A%E7%A9%BA%E6%AF%94%E9%81%BF%E9%96%8B%E5%B8%82%E5%A0%B4%E5%9B%9E%E6%AA%94%E9%A2%A8%E9%9A%9B--66b07c748a27622f1c8932ab",
+          "https://gooptions.cc/%E4%BA%86%E8%A7%A3%E5%8F%B0%E6%8C%87%E6%9C%9F%E6%95%A3%E6%88%B6%E5%A4%9A%E7%A9%BA%E6%AF%94%EF%BC%8C%E7%9C%8B%E7%9C%8B%E6%95%A3%E6%88%B6%E5%8B%95%E5%90%91%E5%86%8D%E8%B7%9F%E4%BB%96%E5%80%91%E5%B0%8D/",
+          "https://www.wantgoo.com/futures/retail-indicator/wmt&"
+        ]
+      },
+      {
+        "topic": "4. 期現貨價差（正逆價差）與股息調整",
+        "claim": "台指期常態價差約在±50點內；6–8月除權息旺季逆價差機械性擴大（期貨提前反映除息蒸發點數），未經股息還原的逆價差『不是』看空訊號。時效數字：2026年6–8月台指期累計除息影響點數估約175–256點，其中台積電兩次除息約98.7點、聯發科約19.25點；2026/7/3時7月合約尚有約115點待蒸發。2026年的異常訊號：遠月合約在除息季仍出現正價差（甚至300–400點極端正價差），代表多頭預期強到蓋過除息扣點，被實務界視為過熱/FOMO警訊。訊號用法共識：股息還原後價差的『變化趨勢』比絕對水位更有意義（逆價差收斂=止跌先行訊號；創高但正價差縮小=多頭後勁不足）。學術端：台灣電子/金融期研究發現『基差偏態』與期貨報酬顯著負相關；門檻模型研究發現台灣『現貨長期領先期貨』（與美國不同）。",
+        "confidence": "medium",
+        "evidence": "除息造成機械性逆價差是高可信共識；175–256點/98.7點等為2026年券商與HiStock估算值（每日隨除息公告變動，時效性強，使用前需更新）；『價差趨勢比水位重要』是實務lore，未見嚴謹統計檢定；基差偏態與現貨領先為論文摘要層級證據。",
+        "source_urls": [
+          "https://dolag.com.tw/2026%E9%99%A4%E6%81%AF.html",
+          "https://histock.tw/stock/exdividendpoint.aspx",
+          "https://news.cnyes.com/news/id/6522027",
+          "https://www.airitilibrary.com/Article/Detail/U0002-0607202114405700",
+          "https://www.airitilibrary.com/Article/Detail/U0002-0706201214235500",
+          "https://winsmart.tw/en/online_teaching/%E6%AD%A3%E5%83%B9%E5%B7%AE%E9%80%86%E5%83%B9%E5%B7%AE/"
+        ]
+      },
+      {
+        "topic": "5. 期交所公布時間與可交易時點（回測lag設定的關鍵）",
+        "claim": "期交所每日公布節奏（多來源引述之官方說明）：日盤13:45收盤商品——三大法人『成交口數』約13:55後公布，『未平倉口數』約下午3時(15:00)後公布；16:15收盤商品（如部分ETF期貨）約下午6時後公布。臺指選擇權Put/Call比、大額交易人未沖銷部位結構表同為每日盤後公布（TAIFEX官網與政府開放資料平台每日更新）。夜盤（15:00–次日05:00）三大法人資料另行揭露，且夜盤成交量『歸屬次一交易日』（例：10/5 15:00至10/6 05:00的夜盤資料歸在10/6）。實務含義：日盤OI資料在15:00後才可得，而夜盤15:00即開盤，故最快可在『當日夜盤』使用剛公布的籌碼（有數分鐘至更久的延遲風險）；嚴謹回測應以『次一交易日日盤開盤』進場（T+1 lag）以避免前視偏誤；夜盤三大法人資料的確切公布時點未能確認，屬待驗證項。",
+        "confidence": "high",
+        "evidence": "13:55/15:00/18:00的分時公布規則為搜尋結果直接引述期交所說明文字，且與夜盤查詢歸屬規則（TAIFEX夜盤頁面）相互一致；唯夜盤三大法人資料公布時刻未找到明確官方時間，標記為不確定。",
+        "source_urls": [
+          "https://www.taifex.com.tw/cht/3/futContractsDate",
+          "https://www.taifex.com.tw/cht/3/futContractsDateAh",
+          "https://www.taifex.com.tw/cht/3/pcRatio",
+          "https://www.taifex.com.tw/cht/3/largeTraderFutQry",
+          "https://data.gov.tw/dataset/11322",
+          "https://data.gov.tw/dataset/11600"
+        ]
+      },
+      {
+        "topic": "跨主題總評：訊號強度排序與共通陷阱",
+        "claim": "綜合證據強度：(a)有學術支持的訊號=外資期貨/選擇權部位（但效應量小，VDC僅~1.4%）與股息還原後基差；(b)實務回測支持但未經同儕審查=小台散戶多空比極端反向（FinLab）；(c)證據最弱=固定門檻的總體PCR（學術顯示僅外資分項有預測力，總體PCR偏落後指標）。共通陷阱：三大法人資料是『多家機構互抵後淨額』非單一策略、外資空單含避險、散戶是殘差近似、除息季基差需還原、所有籌碼資料T日15:00後才可得（回測需T+1）。",
+        "confidence": "medium",
+        "evidence": "本條為研究員綜合判斷，依前述各條來源之一致性與方法嚴謹度加權。",
+        "source_urls": [
+          "https://www.taifex.com.tw/cht/3/futContractsDate",
+          "https://finlab.finance/data/futures-institutional-flow"
+        ]
+      }
+    ],
+    "summary": "籌碼面對台指期的預測力「存在但偏弱且有條件」：學術實證顯示外資是期貨與選擇權市場中最具資訊內涵的交易人（外資淨未平倉對台指期變異數解釋約1.43%、外資選擇權volume-PCR可預測次日報酬），但整體市場的Put/Call比更像落後/同時指標，固定門檻（如OI-PCR 1.0或1.2/0.8）僅是實務經驗法則、應動態調整。散戶多空比方面，FinLab 13年回測指出大台散戶其實偏順勢（是大戶避險的鏡像），只有小台散戶的極端值適合當反指標（極端看空後0050後20日年化約32%）。期現貨價差必須先還原除權息蒸發點數（2026年6–8月約175–256點）才有訊號意義，且實務共識是價差「趨勢變化」比絕對水位重要；2026年除息季罕見的大幅正價差被視為多頭過熱警訊。實務時間差關鍵：期交所日盤三大法人未平倉約15:00後公布（成交量13:55後、16:15收盤商品18:00後），夜盤資料歸屬次一交易日，因此嚴謹回測應以T+1日盤開盤進場，最激進也只能用當日15:00後的夜盤；夜盤法人資料確切公布時點仍待驗證。所有數字中，FinLab/TEJ回測績效與2026除息點數屬時效性強或單一來源資料，納入策略前應以期交所原始資料自行複測。"
+  },
+  "risk": {
+    "findings": [
+      {
+        "topic": "極端事件：2024/8/5 全球股災（日圓套利平倉）",
+        "claim": "2024/8/5 台股加權指數收盤重挫 1,807.21 點（-8.35%），收 19,830.88 點，盤中最多跌 1,854.59 點，創當時史上最大單日跌點與跌幅（後於 2025/4/7 被打破）；台指期當日同步重挫並一度逼近跌停，但本次搜尋未能取得台指期當日精確跳空與收盤點數",
+        "confidence": "high",
+        "evidence": "多家媒體一致報導：收盤 -1,807.21 點、-8.35%、創四大紀錄；起因為日本央行升息引發日圓套利交易平倉、美國衰退疑慮。台指期單日精確數字（傳聞跌近 2,000 點）未獲來源確認，屬需驗證項",
+        "source_urls": [
+          "https://tw.stock.yahoo.com/news/%E5%8F%B0%E8%82%A1%E5%B4%A9%E8%B7%8C1807%E9%BB%9E%E5%A4%B1%E5%AE%882%E8%90%AC-%E8%B7%8C%E9%BB%9E%E8%88%87%E8%B7%8C%E5%B9%85%E7%9A%86%E5%89%B5%E6%AD%B7%E5%B9%B4%E6%96%B0%E9%AB%98-061351796.html",
+          "https://www.linebank.com.tw/wealth-investment/topics/232",
+          "https://ec.ltn.com.tw/article/breakingnews/5462798"
+        ]
+      },
+      {
+        "topic": "極端事件：2025/4/7 川普關稅股災（史上最大跳空實例）",
+        "claim": "2025/4/7 台指期開盤即跳空跌停：自 21,296 點直接開在 19,167 點，跳空狂殺 2,129 點（-10% 跌停幅度用盡）；現貨加權指數終場暴跌 2,065.87 點（-9.70%），為台股史上最大單日跌點與跌幅紀錄，台積電等權值股跌停鎖死，金管會隨後限制放空",
+        "confidence": "high",
+        "evidence": "ETtoday 快訊與維基百科 2025年股災條目、中央社均記載相同數字。此為台指期「開盤跳空即鎖跌停」的最極端實例：多單隔夜完全無法在跌停前出場",
+        "source_urls": [
+          "https://finance.ettoday.net/news/2938471",
+          "https://zh.wikipedia.org/zh-tw/2025%E5%B9%B4%E8%82%A1%E7%81%BD",
+          "https://www.cna.com.tw/news/afe/202504070087.aspx"
+        ]
+      },
+      {
+        "topic": "極端事件：2018/2/6 選擇權大屠殺（0206 事件）",
+        "claim": "2018/2/6 台指期 8:45 以 10,643 點開出、跳空下跌 284 點（約 -2.6%）；8:50 起多檔深價外買權與賣權在 1 秒內拉到漲停，保證金風險指標因異常價格嚴重失真，期貨商連鎖強制平倉，投資人總損失估逾新台幣 40 億元，全市場違約金額 14.4 億元",
+        "confidence": "high",
+        "evidence": "維基百科「0206選擇權價格波動事件」條目與自由時報、旺得富等報導數字一致。教訓：跳空本身不大（-2.6%），但流動性真空 + 以市價強制平倉機制會使損失遠超過理論值（大跌日買權竟漲停）",
+        "source_urls": [
+          "https://zh.wikipedia.org/zh-tw/0206%E9%81%B8%E6%93%87%E6%AC%8A%E5%83%B9%E6%A0%BC%E6%B3%A2%E5%8B%95%E4%BA%8B%E4%BB%B6",
+          "http://news.ltn.com.tw/news/weeklybiz/paper/1190719",
+          "https://wantrich.chinatimes.com/news/20260206900002-420101"
+        ]
+      },
+      {
+        "topic": "極端事件：2020/3 COVID 股災",
+        "claim": "2020/3 疫情+油價暴跌（3/9 油價單日 -30%、美股史上首度連續多次熔斷），台股自高點 11,525 跌至 3/20 前後低點 8,523（約 -26%）；3/16 收盤大跌 411 點收 9,717。台指期於該期間多日大幅跳空與逆價差擴大，但單日台指期精確跳空點數本次未能從搜尋結果確認（需以期交所歷史行情驗證）",
+        "confidence": "medium",
+        "evidence": "維基百科 2020 黑色星期一條目與 TVBS、StockFeel 股災整理。TAIEX 區間跌幅與 3/16 數字有來源；台指期單日明細（如 3/13、3/19 盤中接近跌停的傳聞）未獲直接來源，標為待驗證",
+        "source_urls": [
+          "https://zh.wikipedia.org/zh-tw/2020%E5%B9%B4%E9%BB%91%E8%89%B2%E6%98%9F%E6%9C%9F%E4%B8%80_(3%E6%9C%8816%E6%97%A5)",
+          "https://news.tvbs.com.tw/money/3260284",
+          "https://www.stockfeel.com.tw/%E8%82%A1%E7%81%BD-%E5%8F%B0%E7%81%A3%E8%82%A1%E5%B8%82%E5%A4%A7%E8%B7%8C-%E5%8F%B0%E9%BC%93%E6%AD%B7%E5%B9%B4%E8%82%A1%E7%81%BD/"
+        ]
+      },
+      {
+        "topic": "極端事件：2026/6/6 台指期夜盤史上最大跌點（最新、對現行策略最相關）",
+        "claim": "2026/6/6 台指期夜盤收盤暴跌 3,006 點（-6.65%）收 42,220 點，創史上最大單日跌點；盤中一度重挫 4,522 點觸及跌停水準，台積電期貨盤中跌停。起因為 AI 科技股高檔賣壓 + 美股前夜重挫。顯示夜盤（流動性較差時段）同樣可能出現近 10% 級別的行情",
+        "confidence": "high",
+        "evidence": "Yahoo 股市、ETtoday、壹蘋（URL 日期 20260606）、民視多家報導數字一致。此事件證明極端行情不只發生在日盤開盤跳空，夜盤持倉同樣暴露於跌停級波動",
+        "source_urls": [
+          "https://tw.stock.yahoo.com/news/%E6%98%9F%E6%9C%9F-%E6%85%98%E4%BA%86-%E5%8F%B0%E6%8C%87%E6%9C%9F%E5%A4%9C%E7%9B%A4%E5%B4%A9%E8%B7%8C3006%E9%BB%9E-%E5%89%B5%E5%8F%B2%E4%B8%8A%E6%9C%80%E5%A4%A7%E8%B7%8C%E5%B9%85-225325787.html",
+          "https://finance.ettoday.net/news/3178734",
+          "https://news.nextapple.com/finance/20260606/D32C3F10855E4C0BF1BD950AC49DE83E"
+        ]
+      },
+      {
+        "topic": "漲跌幅限制",
+        "claim": "臺股期貨（TX）每日漲跌幅限制自 2015/6/1 起放寬為前一日結算價之 ±10%，夜盤（盤後交易時段）沿用同一區間基準；因此理論最大單日不利跳空約為 10%，以指數 45,000 計，大台一口一日極端損失可達約 45,000×10%×200 = 90 萬元，已超過現行原始保證金",
+        "confidence": "medium",
+        "evidence": "期交所新制專區記載 2015/6/1 放寬至 10%；夜盤與日盤共用前一結算價基準為市場慣例說明（期交所商品頁為準）。90 萬元為本研究換算，非來源直接數字",
+        "source_urls": [
+          "https://www.taifex.com.tw/chinese/event/train1040414/event.asp",
+          "https://www.taifex.com.tw/cht/2/tX"
+        ]
+      },
+      {
+        "topic": "保證金水準（時效敏感）",
+        "claim": "台指期保證金隨指數與波動度機動調整：2026/2/26 曾調整為原始 412,000/維持 316,000 再調至 374,000 元；2026/7 因指數攀升（加權指數約 45,000 點）再調升，多家期貨商頁面顯示大台原始保證金現為 636,000 元（小台 159,000、微台 31,800）。實際適用金額務必以期交所「保證金一覽表」當日公告為準",
+        "confidence": "medium",
+        "evidence": "凱基期貨 2026/2/26 調整公告 PDF 與統一/元大/群益期貨保證金頁、風傳媒報導。數字變動頻繁，636,000 為 2026/7-8 搜尋所得快照",
+        "source_urls": [
+          "https://www.kgi.com.tw/zh-tw/-/media/files/kgif/settlement/_20260226.pdf",
+          "https://www.taifex.com.tw/cht/5/indexMarging",
+          "https://www.storm.mg/article/11098258"
+        ]
+      },
+      {
+        "topic": "保證金追繳與強制平倉（斷頭）規則",
+        "claim": "兩層機制：(1) 盤後追繳——收盤後權益數低於「維持保證金」即發追繳通知，須於次一營業日中午 12:00 前補足至「原始保證金」水準，否則期貨商執行部分代沖銷至權益數≥原始保證金；(2) 盤中砍倉——盤中任一時點「風險指標」（約 = 權益總值 ÷ 未沖銷部位所需原始保證金）低於 25% 時，期貨商即以市價單/一定範圍市價單/合理限價單處分部分或全部部位（俗稱斷頭）；快市無法處理完時得於次一盤別繼續處理；平倉後若權益數為負（over loss）交易人仍須補足",
+        "confidence": "high",
+        "evidence": "永豐期貨風險控管作業文件、我愛期貨、台新期貨、康和期貨等多個期貨商說明一致（25% 為市場通行約定比率，個別期貨商契約可能不同，開戶約定書為準）。注意 0206 事件即是「異常價格→風險指標失真→市價強制平倉」的連鎖案例",
+        "source_urls": [
+          "https://www.spf.com.tw/upload/sinopac/transactionContent/1754f87419b00000845b.pdf",
+          "https://ilovefutures.tw/%E6%9C%9F%E8%B2%A8%E3%80%81%E9%81%B8%E6%93%87%E6%AC%8A%E7%9A%84%E9%A2%A8%E9%9A%AA%E6%8C%87%E6%A8%99%EF%BC%8C%E7%9B%A4%E4%B8%AD%E4%BD%8E%E6%96%BC25%E5%B0%B1%E6%9C%83%E5%BC%B7%E5%88%B6%E5%B9%B3%E5%80%89/",
+          "https://futurespepper.com/margincall/",
+          "https://dolag.com.tw/%E6%9C%9F%E8%B2%A8%E7%9B%A4%E5%BE%8C%E8%BF%BD%E7%B9%B3%E4%BF%9D%E8%AD%89%E9%87%91%E6%80%8E%E9%BA%BC%E8%BE%A6%E4%BD%95%E6%99%82%E8%A2%AB%E6%96%B7%E9%A0%AD%E5%BC%B7%E5%88%B6%E5%B9%B3%E5%80%89%E6%AC%8A.html"
+        ]
+      },
+      {
+        "topic": "滑價實務（日盤）",
+        "claim": "實務統計與程式交易圈慣例：大台日盤正常行情下市價單平均滑價約 1~1.5 點/邊；回測常用假設為每邊 1~2 點或來回含手續費期交稅共約 NT$1,000（大台 200 元/點，約合來回 3~5 點總成本）；順勢/突破訊號在急行情進場，單邊滑價可達 3 點以上、來回 6 點以上，對每筆期望獲利僅 10~20 點的當沖策略侵蝕極大",
+        "confidence": "medium",
+        "evidence": "期客投資策略（附實際成交價位的滑價統計，平均約 1.5 點）、理財周刊、Mr.Market、量化通 QuantPass 的回測成本設定教學。皆為實務者統計/慣例而非官方數據，滑價隨波動度與時段變化大，宜用自有成交回報重估",
+        "source_urls": [
+          "https://check3188.pixnet.net/blog/post/1089337",
+          "https://www.moneyweekly.com.tw/Magazine/Info/%E7%90%86%E8%B2%A1%E5%91%A8%E5%88%8A/43860",
+          "https://rich01.com/blog-post_7-4/",
+          "https://quantpass.org/tv-txf-cost/"
+        ]
+      },
+      {
+        "topic": "夜盤流動性",
+        "claim": "以 2023/9 統計，台指期夜盤（15:00~次日 5:00，14 小時）成交量約占全日的 34%；換算單位時間流動性遠低於日盤（日盤 5 小時占 66%），夜盤買賣價差較寬、掛單簿較薄，小量單即可推動價格，技術指標易失真；但美國經濟數據公布或美股劇烈波動時，夜盤瞬間波動可超越日盤（如 2026/6/6 夜盤 -3,006 點）",
+        "confidence": "medium",
+        "evidence": "元大期貨投資教室（34% 數據，2023/9）、StockFeel、我愛期貨、capfutures 夜盤指南均描述夜盤流動性較差。34% 為單一時點統計，最新占比應以期交所日交易統計驗證",
+        "source_urls": [
+          "https://www.yuantafutures.com.tw/investment_school_01",
+          "https://www.stockfeel.com.tw/%E5%A4%9C%E7%9B%A4%E4%BA%A4%E6%98%93-%E6%9C%9F%E6%AC%8A-%E6%97%A5%E7%9B%A4/",
+          "https://ilovefutures.tw/%E5%8F%B0%E6%8C%87%E6%9C%9F%E5%A4%9C%E7%9B%A4%E8%88%87%E6%97%A5%E7%9B%A4%EF%BC%9A%E5%85%A8%E9%9D%A2%E4%BA%86%E8%A7%A3%E4%BA%A4%E6%98%93%E6%99%82%E9%96%93%E8%88%87%E8%A6%8F%E5%89%87/"
+        ]
+      },
+      {
+        "topic": "凱利公式與固定比例部位控管",
+        "claim": "實務共識：(1) 完整凱利對參數估計誤差與肥尾極度敏感，期貨實務普遍採半凱利（1/2 Kelly）甚至 1/4 凱利；(2) 更常用的是固定比例風險法——單筆交易風險（進場價至停損價 × 每點 200 元 × 口數）控制在權益的 1~2%（索普：單次不押超過總資金 2% 幾乎不會破產）；(3) 台指期須額外考慮跳空風險：停損單擋不住開盤跳空，部位上限應以「單日 ±10% 極端跳空損失仍在可承受回撤內」反推口數，而非只用停損距離反推",
+        "confidence": "medium",
+        "evidence": "中文量化圈多篇凱利公式實務文章（半凱利/分數凱利、1-2% 風險、動態凱利與最大回撤控制）；第 (3) 點為本研究依 2025/4/7 開盤鎖跌停案例（停損完全無法執行）之綜合推論",
+        "source_urls": [
+          "https://mecling.substack.com/p/2ab",
+          "https://vocus.cc/article/67f88da1fd897800015ef113",
+          "https://www.monetamarkets.com/hant/risk/kelly-criterion-modified/",
+          "https://ztraderai.medium.com/%E6%B7%B1%E5%BA%A6%E7%90%86%E8%A7%A3%E5%87%B1%E5%88%A9%E5%85%AC%E5%BC%8F-%E4%BA%A4%E6%98%93%E5%93%A1%E5%BF%85%E8%AE%80-3139b77aa2d4"
+        ]
+      },
+      {
+        "topic": "稅務：期交稅",
+        "claim": "股價類期貨契約（含大/小/微台）期貨交易稅為每次交易契約金額的十萬分之2（0.002%），買進、賣出各課一次；以指數 45,000 點的大台為例：45,000×200×0.00002 = 每邊約 NT$180，來回約 NT$360（約合 1.8 點）",
+        "confidence": "high",
+        "evidence": "財政部稅務入口網與高雄國稅局期貨交易稅說明；點數換算為本研究依現行契約規格（大台每點 200 元）計算",
+        "source_urls": [
+          "https://www.etax.nat.gov.tw/etwmain/tax-info/understanding/tax-saving-manual/national/future-transaction-tax/12B2ODn",
+          "https://www.ntbk.gov.tw/singlehtml/467fa29299ca48bc9ab74d1fc714b38b?cntId=55f6bfa2c8cc416e925a8fa68571ffcc"
+        ]
+      },
+      {
+        "topic": "稅務：期貨交易所得之所得稅",
+        "claim": "所得稅法第4條之2：凡依期貨交易稅條例課徵期貨交易稅之期貨交易（含台指期）之交易所得「暫行停止課徵所得稅」，交易損失亦不得自所得額中減除——即個人在國內期交所交易台指期的獲利目前免納綜所稅，也不計入個人基本所得額；但若透過營利事業交易，證期交易所得仍須計入營利事業基本稅額（最低稅負制）",
+        "confidence": "high",
+        "evidence": "全國法規資料庫所得稅法條文、財政部稅務入口網 Q&A、會計師事務所解析（營利事業部分）。「暫行停徵」屬政策性措施，法律上保留未來恢復課徵之可能",
+        "source_urls": [
+          "https://law.moj.gov.tw/LawClass/LawSingle.aspx?pcode=G0340003&flno=4",
+          "https://www.etax.nat.gov.tw/etwmain/tax-info/understanding/tax-q-and-a/national/profit-seeking-enterprise-income-tax/non-operating-income-expense-calculation/z3Q5B3Q",
+          "https://www.wanchicpa.com.tw/%E8%AD%89%E5%88%B8%E4%BA%A4%E6%98%93%E6%89%80%E5%BE%97%E9%9B%96%E7%84%B6%E5%81%9C%E5%BE%B5%E6%89%80%E5%BE%97%E7%A8%85%EF%BC%8C%E7%87%9F%E5%88%A9%E4%BA%8B%E6%A5%AD%E4%BB%8D%E6%87%89%E6%AD%A3%E7%A2%BA/"
+        ]
+      },
+      {
+        "topic": "稅務：海外期貨（對照補充）",
+        "claim": "若交易海外期貨（如 CME 台股相關或美指期），獲利屬海外所得：全戶年度海外所得達 NT$100 萬即須全數計入基本所得額申報；基本所得額超過免稅額 NT$750 萬（2023 年度起）部分按 20% 課基本稅額。國內台指期則無此問題",
+        "confidence": "high",
+        "evidence": "財政部稅務入口網 Q&A 1744、經濟日報、康和期貨說明均一致",
+        "source_urls": [
+          "https://www.etax.nat.gov.tw/etwmain/tax-info/understanding/tax-q-and-a/national/individual-income-tax/basic-tax-question/oversea-income/awYgOG9",
+          "https://money.udn.com/money/story/6710/9367169",
+          "https://dolag.com.tw/%E6%B5%B7%E5%A4%96%E6%89%80%E5%BE%97%E8%AA%B2%E7%A8%85.html"
+        ]
+      }
+    ],
+    "summary": "台指期的尾部風險以「跳空+強制平倉」為核心：2025/4/7 台指期開盤直接跳空 2,129 點鎖跌停（-10% 幅度用盡，停損完全無法執行）、2024/8/5 現貨單日 -8.35%、2018/2/6 則示範了保證金風險指標失真引發的連鎖斷頭（損失逾 40 億、違約 14.4 億），最新的 2026/6/6 夜盤更暴跌 3,006 點（盤中 -4,522 點觸及跌停）證明夜盤持倉同樣暴露於極端行情。制度面：漲跌幅限制 ±10%；權益數低於維持保證金即遭盤後追繳（次日中午前須補至原始保證金），盤中風險指標低於約 25% 即被市價代沖銷，超損仍須補繳；現行大台原始保證金約 63.6 萬元（2026/7 快照，隨指數機動調整）。執行面：日盤市價單滑價實測平均約 1~1.5 點/邊（回測慣用每邊 1~2 點或來回 NT$1,000），夜盤成交量僅約占全日 34%（14 小時），單位時間流動性遠低於日盤且價差較寬。部位控管實務建議採 1/2 至 1/4 凱利或固定比例法（單筆風險 1~2% 權益），且口數上限應以「±10% 極端跳空損失仍可承受」反推，而非僅靠停損距離。稅務上國內台指期僅課期交稅（契約金額十萬分之2、買賣各一次，大台每邊約 180 元），交易所得依所得稅法第 4-2 條暫停課徵所得稅（損失亦不得扣除）；海外期貨獲利則屬海外所得，適用最低稅負制（100 萬申報門檻、750 萬免稅額、20% 稅率）。不確定待驗證項：2024/8/5 與 2020/3 台指期各日的精確跳空點數（建議以期交所每日行情檔驗證）、夜盤量占比與保證金金額的最新數值。"
+  }
+}
