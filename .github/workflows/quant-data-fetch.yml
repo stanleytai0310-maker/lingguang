@@ -1,0 +1,44 @@
+name: quant-data-fetch
+
+on:
+  push:
+    branches: ["claude/quantitative-trading-research-h9wlnb"]
+    paths:
+      - "quant-research/datafetch/**"
+      - ".github/workflows/quant-data-fetch.yml"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: quant-data-fetch
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: claude/quantitative-trading-research-h9wlnb
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r quant-research/datafetch/requirements.txt
+
+      - name: Fetch TAIFEX / TWSE historical data
+        run: python quant-research/datafetch/fetch_taifex.py --out quant-research/data
+
+      - name: Commit data back to branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add quant-research/data
+          git commit -m "data: TAIFEX/TWSE historical download [skip ci]" || echo "no changes"
+          git pull --rebase origin claude/quantitative-trading-research-h9wlnb
+          git push origin HEAD:claude/quantitative-trading-research-h9wlnb

@@ -1,0 +1,190 @@
+#!/usr/bin/env python3
+"""Download official TAIFEX / TWSE historical data for TX (台指期) research.
+
+Datasets:
+  1. TAIFEX futures daily OHLC per contract (TX, MTX)   — from 1998-07 / 2001-04
+  2. TAIFEX institutional investors by contract (TXF, MXF) — from 2007-07
+  3. TAIFEX TXO put/call ratio                           — from 2001-12
+  4. TWSE TAIEX index daily OHLC                         — from 1999-01
+  5. Yahoo ^TWII daily (cross-check, non-fatal)
+
+Designed to run inside GitHub Actions (unrestricted egress). Each dataset is
+fetched in monthly chunks with retries; partial failures are recorded in
+failures.json instead of aborting the whole job.
+"""
+import argparse
+import concurrent.futures as cf
+import datetime as dt
+import hashlib
+import io
+import json
+import random
+import time
+from pathlib import Path
+
+import pandas as pd
+import requests
+
+UA = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) research-data-fetch/1.0"}
+TAIFEX = "https://www.taifex.com.tw/cht/3"
+FAILURES = []
+
+
+def month_starts(start: dt.date, end: dt.date):
+    cur = dt.date(start.year, start.month, 1)
+    while cur <= end:
+        nxt = dt.date(cur.year + (cur.month == 12), cur.month % 12 + 1, 1)
+        yield max(cur, start), min(nxt - dt.timedelta(days=1), end)
+        cur = nxt
+
+
+def post_csv(url: str, data: dict, tag: str, tries: int = 4) -> str | None:
+    for i in range(tries):
+        try:
+            r = requests.post(url, data=data, headers=UA, timeout=60)
+            if r.status_code == 200 and len(r.content) > 10:
+                for enc in ("utf-8-sig", "big5", "cp950"):
+                    try:
+                        return r.content.decode(enc)
+                    except UnicodeDecodeError:
+                        continue
+                return r.content.decode("utf-8", errors="replace")
+            raise RuntimeError(f"http={r.status_code} len={len(r.content)}")
+        except Exception as e:  # noqa: BLE001
+            if i == tries - 1:
+                FAILURES.append({"tag": tag, "data": data, "error": str(e)})
+                return None
+            time.sleep(2**i + random.random())
+    return None
+
+
+def parse_csv_text(txt: str) -> pd.DataFrame | None:
+    lines = [l for l in txt.splitlines() if l.strip()]
+    if len(lines) < 2:
+        return None
+    try:
+        return pd.read_csv(io.StringIO("\n".join(lines)), thousands=",")
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def fetch_monthly(url, base_data, date_keys, start, end, tag, workers=3):
+    chunks = list(month_starts(start, end))
+
+    def one(c):
+        s, e = c
+        d = dict(base_data)
+        d[date_keys[0]] = s.strftime("%Y/%m/%d")
+        d[date_keys[1]] = e.strftime("%Y/%m/%d")
+        time.sleep(0.2 + random.random() * 0.3)
+        txt = post_csv(url, d, f"{tag}:{s}")
+        return parse_csv_text(txt) if txt else None
+
+    out = []
+    with cf.ThreadPoolExecutor(max_workers=workers) as ex:
+        for df in ex.map(one, chunks):
+            if df is not None and len(df):
+                out.append(df)
+    if not out:
+        return pd.DataFrame()
+    res = pd.concat(out, ignore_index=True)
+    res = res.drop_duplicates()
+    return res
+
+
+def fetch_futures_daily(out_dir: Path, today: dt.date):
+    for commodity, start in [("TX", dt.date(1998, 7, 21)), ("MTX", dt.date(2001, 4, 9))]:
+        df = fetch_monthly(
+            f"{TAIFEX}/futDataDown",
+            {"down_type": "1", "commodity_id": commodity},
+            ("queryStartDate", "queryEndDate"),
+            start, today, f"fut_{commodity}",
+        )
+        df.to_csv(out_dir / f"futures_daily_{commodity}.csv", index=False)
+        print(f"[futures {commodity}] rows={len(df)}")
+
+
+def fetch_institutional(out_dir: Path, today: dt.date):
+    for commodity in ["TXF", "MXF"]:
+        df = fetch_monthly(
+            f"{TAIFEX}/futContractsDateDown",
+            {"commodityId": commodity},
+            ("queryStartDate", "queryEndDate"),
+            dt.date(2007, 7, 2), today, f"inst_{commodity}",
+        )
+        df.to_csv(out_dir / f"institutional_{commodity}.csv", index=False)
+        print(f"[institutional {commodity}] rows={len(df)}")
+
+
+def fetch_pc_ratio(out_dir: Path, today: dt.date):
+    df = fetch_monthly(
+        f"{TAIFEX}/pcRatioDown", {},
+        ("queryStartDate", "queryEndDate"),
+        dt.date(2001, 12, 24), today, "pcr",
+    )
+    df.to_csv(out_dir / "txo_pc_ratio.csv", index=False)
+    print(f"[pc_ratio] rows={len(df)}")
+
+
+def fetch_taiex(out_dir: Path, today: dt.date):
+    rows = []
+    for s, _e in month_starts(dt.date(1999, 1, 1), today):
+        url = ("https://www.twse.com.tw/rwd/zh/TAIEX/MI_5MINS_HIST"
+               f"?date={s.strftime('%Y%m01')}&response=json")
+        for i in range(4):
+            try:
+                time.sleep(0.15 + random.random() * 0.2)
+                r = requests.get(url, headers=UA, timeout=30)
+                j = r.json()
+                if j.get("stat") == "OK" and j.get("data"):
+                    rows.extend(j["data"])
+                break
+            except Exception as e:  # noqa: BLE001
+                if i == 3:
+                    FAILURES.append({"tag": f"taiex:{s}", "error": str(e)})
+                time.sleep(2**i)
+    df = pd.DataFrame(rows, columns=["date_roc", "open", "high", "low", "close"])
+    df.to_csv(out_dir / "taiex_daily_raw.csv", index=False)
+    print(f"[taiex] rows={len(df)}")
+
+
+def fetch_yahoo(out_dir: Path):
+    try:
+        import yfinance as yf
+        df = yf.download("^TWII", start="1997-01-01", progress=False, auto_adjust=False)
+        if hasattr(df.columns, "levels"):
+            df.columns = [c[0] for c in df.columns]
+        df.to_csv(out_dir / "twii_yahoo.csv")
+        print(f"[yahoo ^TWII] rows={len(df)}")
+    except Exception as e:  # noqa: BLE001
+        FAILURES.append({"tag": "yahoo_twii", "error": str(e)})
+        print(f"[yahoo ^TWII] FAILED (non-fatal): {e}")
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--out", default="quant-research/data")
+    args = ap.parse_args()
+    out_dir = Path(args.out)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    today = dt.date.today()
+
+    fetch_taiex(out_dir, today)
+    fetch_futures_daily(out_dir, today)
+    fetch_institutional(out_dir, today)
+    fetch_pc_ratio(out_dir, today)
+    fetch_yahoo(out_dir)
+
+    manifest = {"generated_utc": dt.datetime.utcnow().isoformat(), "files": {}}
+    for f in sorted(out_dir.glob("*.csv")):
+        h = hashlib.sha256(f.read_bytes()).hexdigest()[:16]
+        n_lines = sum(1 for _ in f.open(encoding="utf-8", errors="replace")) - 1
+        manifest["files"][f.name] = {"rows": n_lines, "sha256_16": h}
+    (out_dir / "manifest.json").write_text(json.dumps(manifest, indent=2))
+    (out_dir / "failures.json").write_text(json.dumps(FAILURES, ensure_ascii=False, indent=2))
+    print(json.dumps(manifest, indent=2))
+    print(f"failures={len(FAILURES)}")
+
+
+if __name__ == "__main__":
+    main()
